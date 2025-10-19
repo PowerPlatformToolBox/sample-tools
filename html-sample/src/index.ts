@@ -1,4 +1,4 @@
-/// <reference types="../types" />
+/// <reference types="@pptb/types" />
 
 /**
  * PowerPlatform Example Tool - Main Entry Point
