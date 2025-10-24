@@ -1,0 +1,39 @@
+{
+    "name": "pptb-standard-sample-tool",
+    "version": "0.1.6",
+    "displayName": "HTML Sample Tool",
+    "description": "A sample Power Platform Tool Box tool built with HTML, CSS, and TypeScript",
+    "main": "index.html",
+    "author": "Power Platform Tool Box",
+    "keywords": [
+        "powerplatform",
+        "dataverse",
+        "toolbox",
+        "pptb",
+        "sample",
+        "html"
+    ],
+    "license": "GPL-3.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/PowerPlatform-ToolBox/desktop-app.git",
+        "directory": "sample/html-sample"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+        "build": "tsc && npm run copy-html && npm run copy-css",
+        "copy-html": "shx cp src/index.html dist/",
+        "copy-css": "shx cp src/styles.css dist/",
+        "watch": "tsc --watch"
+    },
+    "devDependencies": {
+        "@pptb/types": "^1.0.1",
+        "typescript": "^5.0.0",
+        "shx": "^0.4.0"
+    },
+    "files": [
+        "dist"
+    ]
+}
