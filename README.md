@@ -185,7 +185,7 @@ Framework samples (React, Vue, Svelte) use Vite with special configuration for P
 | **HMR Support** | No | Yes | Yes | Yes |
 | **Ecosystem** | Standard Web | Large | Large | Growing |
 
-*Bundle sizes are for built IIFE bundles with all features included*
+*Bundle sizes for HTML sample include compiled TypeScript; framework samples are IIFE bundles with all features included*
 
 ---
 
