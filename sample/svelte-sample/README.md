@@ -310,18 +310,32 @@ If connection is null:
 
 ## Vite Configuration
 
-The `vite.config.ts` is configured for Power Platform Tool Box:
+The `vite.config.js` is configured for Power Platform Tool Box compatibility:
 
-```typescript
+```javascript
 export default defineConfig({
-    plugins: [svelte()],
+    plugins: [svelte(), fixHtmlForPPTB()],
     base: './',  // Relative paths for embedded usage
     build: {
         outDir: 'dist',
-        assetsDir: 'assets'
+        assetsDir: 'assets',
+        rollupOptions: {
+            output: {
+                // Use IIFE format for compatibility with iframe + file:// URLs
+                format: 'iife',
+                // Bundle everything into a single file
+                inlineDynamicImports: true,
+                manualChunks: undefined,
+            },
+        },
     }
 });
 ```
+
+**Key Configurations for PPTB:**
+- **IIFE Format**: Uses Immediately Invoked Function Expression instead of ES modules for compatibility with PPTB's iframe loading mechanism
+- **Single Bundle**: All code and CSS bundled into one file to avoid module loading issues
+- **HTML Plugin**: Custom plugin removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
 
 ## Svelte 5 Features
 
