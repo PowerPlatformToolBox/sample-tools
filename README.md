@@ -103,6 +103,15 @@ All samples include comprehensive examples of:
 ✅ Responsive UI design  
 ✅ Production-ready builds  
 
+### Build Configuration for PPTB Compatibility
+
+Framework samples (React, Vue, Svelte) use Vite with special configuration for PPTB:
+
+✅ **IIFE Format**: Builds use Immediately Invoked Function Expression instead of ES modules for compatibility with PPTB's iframe loading mechanism  
+✅ **Single Bundle**: All code and CSS bundled into one file to avoid module loading issues  
+✅ **HTML Optimization**: Custom plugin removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs  
+✅ **No External Dependencies**: All dependencies bundled together for standalone execution
+
 ---
 
 ## Quick Start
@@ -168,7 +177,7 @@ All samples include comprehensive examples of:
 
 | Feature | HTML | React | Vue | Svelte |
 |---------|------|-------|-----|--------|
-| **Bundle Size** | ~50KB | ~155KB | ~72KB | ~42KB |
+| **Bundle Size** | ~50KB | ~158KB | ~77KB | ~45KB |
 | **Runtime Overhead** | Minimal | Medium | Medium | Minimal |
 | **Learning Curve** | Easy | Moderate | Easy | Easy |
 | **TypeScript Support** | Excellent | Excellent | Excellent | Excellent |
@@ -176,7 +185,7 @@ All samples include comprehensive examples of:
 | **HMR Support** | No | Yes | Yes | Yes |
 | **Ecosystem** | Standard Web | Large | Large | Growing |
 
-*Bundle sizes are approximate and include all sample features*
+*Bundle sizes are for built IIFE bundles with all features included*
 
 ---
 
