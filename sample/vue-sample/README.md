@@ -310,7 +310,9 @@ export default defineConfig({
 **Key Configurations for PPTB:**
 - **IIFE Format**: Uses Immediately Invoked Function Expression instead of ES modules for compatibility with PPTB's iframe loading mechanism
 - **Single Bundle**: All code and CSS bundled into one file to avoid module loading issues
-- **HTML Plugin**: Custom plugin removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
+- **HTML Plugin**: Custom plugin that:
+  - Removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
+  - Moves script tags from `<head>` to end of `<body>` so DOM elements are available when IIFE executes
 
 ## Vue 3 Composition API
 

@@ -109,7 +109,9 @@ Framework samples (React, Vue, Svelte) use Vite with special configuration for P
 
 ✅ **IIFE Format**: Builds use Immediately Invoked Function Expression instead of ES modules for compatibility with PPTB's iframe loading mechanism  
 ✅ **Single Bundle**: All code and CSS bundled into one file to avoid module loading issues  
-✅ **HTML Optimization**: Custom plugin removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs  
+✅ **HTML Optimization**: Custom plugin that:
+   - Removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
+   - Moves script tags to end of `<body>` so DOM elements are available when IIFE executes  
 ✅ **No External Dependencies**: All dependencies bundled together for standalone execution
 
 ---
