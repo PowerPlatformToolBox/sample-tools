@@ -1,6 +1,6 @@
 {
     "name": "pptb-react-sample-tool",
-    "version": "0.1.1",
+    "version": "0.2.12",
     "displayName": "React Sample Tool",
     "description": "A sample Power Platform Tool Box tool built with React, Vite, and TypeScript",
     "main": "index.html",

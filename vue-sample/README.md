@@ -285,18 +285,34 @@ If connection is null:
 
 ## Vite Configuration
 
-The `vite.config.ts` is configured for Power Platform Tool Box:
+The `vite.config.ts` is configured for Power Platform Tool Box compatibility:
 
 ```typescript
 export default defineConfig({
-    plugins: [vue()],
+    plugins: [vue(), fixHtmlForPPTB()],
     base: './',  // Relative paths for embedded usage
     build: {
         outDir: 'dist',
-        assetsDir: 'assets'
+        assetsDir: 'assets',
+        rollupOptions: {
+            output: {
+                // Use IIFE format for compatibility with iframe + file:// URLs
+                format: 'iife',
+                // Bundle everything into a single file
+                inlineDynamicImports: true,
+                manualChunks: undefined,
+            },
+        },
     }
 });
 ```
+
+**Key Configurations for PPTB:**
+- **IIFE Format**: Uses Immediately Invoked Function Expression instead of ES modules for compatibility with PPTB's iframe loading mechanism
+- **Single Bundle**: All code and CSS bundled into one file to avoid module loading issues
+- **HTML Plugin**: Custom plugin that:
+  - Removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
+  - Moves script tags from `<head>` to end of `<body>` so DOM elements are available when IIFE executes
 
 ## Vue 3 Composition API
 

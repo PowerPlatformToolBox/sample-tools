@@ -1,6 +1,6 @@
 {
     "name": "pptb-svelte-sample-tool",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "type": "module",
     "displayName": "Svelte Sample Tool",
     "description": "A sample Power Platform Tool Box tool built with Svelte 5, Vite, and TypeScript",
