@@ -1,8 +1,19 @@
 import './app.css';
 import App from './App.svelte';
 
-const app = new App({
-    target: document.getElementById('app')!,
-});
+// Ensure DOM is ready and app element exists
+const appElement = document.getElementById('app');
+let app;
+
+if (appElement && !appElement.hasAttribute('data-svelte-initialized')) {
+    // Mark as initialized to prevent double initialization
+    appElement.setAttribute('data-svelte-initialized', 'true');
+    
+    app = new App({
+        target: appElement,
+    });
+} else if (!appElement) {
+    console.error('App element not found. Make sure the HTML contains <div id="app"></div>');
+}
 
 export default app;
