@@ -1,19 +1,17 @@
-import { useCallback } from 'react';
-import { ConnectionStatus } from './components/ConnectionStatus';
-import { ToolboxAPIDemo } from './components/ToolboxAPIDemo';
-import { DataverseAPIDemo } from './components/DataverseAPIDemo';
-import { EventLog } from './components/EventLog';
-import { useConnection, useToolboxEvents, useEventLog } from './hooks/useToolboxAPI';
+import { useCallback, useEffect } from "react";
+import { ConnectionStatus } from "./components/ConnectionStatus";
+import { DataverseAPIDemo } from "./components/DataverseAPIDemo";
+import { EventLog } from "./components/EventLog";
+import { ToolboxAPIDemo } from "./components/ToolboxAPIDemo";
+import { useConnection, useEventLog, useToolboxEvents } from "./hooks/useToolboxAPI";
 
 function App() {
     const { connection, isLoading, refreshConnection } = useConnection();
-    const { logs, addLog, clearLogs } = useEventLog();
+    const { logs, addLog, clearLogs  } = useEventLog();
 
     // Handle platform events
     const handleEvent = useCallback(
         (event: string, _data: any) => {
-            addLog(`Event: ${event}`, 'info');
-
             switch (event) {
                 case 'connection:updated':
                 case 'connection:created':
@@ -31,15 +29,15 @@ function App() {
                     break;
             }
         },
-        [addLog, refreshConnection]
+        [refreshConnection]
     );
 
     useToolboxEvents(handleEvent);
 
-    // Add initial log
-    useCallback(() => {
+    // Add initial log (run only once on mount)
+    useEffect(() => {
         addLog('React Sample Tool initialized', 'success');
-    }, [addLog])();
+    }, [addLog]);
 
     return (
         <>
@@ -49,7 +47,7 @@ function App() {
             </header>
 
             <ConnectionStatus connection={connection} isLoading={isLoading} />
-
+ 
             <ToolboxAPIDemo onLog={addLog} />
 
             <DataverseAPIDemo connection={connection} onLog={addLog} />
