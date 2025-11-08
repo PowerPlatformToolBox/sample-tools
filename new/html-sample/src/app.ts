@@ -39,6 +39,9 @@ async function initialize() {
         // Apply theme
         await applyTheme();
 
+    // Load any previously saved setting into UI
+    await loadToolSetting();
+
         log('Tool initialized successfully', 'success');
     } catch (error) {
         log(`Initialization error: ${(error as Error).message}`, 'error');
@@ -166,6 +169,11 @@ function setupEventHandlers() {
     // Advanced utilities demos
     document.getElementById('parallel-demo-btn')?.addEventListener('click', demoExecuteParallel);
     document.getElementById('loading-demo-btn')?.addEventListener('click', demoLoading);
+
+    // Settings buttons
+    document.getElementById('load-setting-btn')?.addEventListener('click', loadToolSetting);
+    document.getElementById('save-setting-btn')?.addEventListener('click', saveToolSetting);
+    document.getElementById('clear-setting-btn')?.addEventListener('click', clearToolSetting);
 }
 
 /**
@@ -360,17 +368,19 @@ async function queryAccounts() {
         const output = document.getElementById('query-output');
         if (output) output.textContent = 'Querying accounts...\n';
 
-        const fetchXml = `
+                // If user saved a FetchXML in settings, prefer that; otherwise use default
+                const saved = await getSetting<string>('demo.fetchxml');
+                const fetchXml = (saved && saved.trim().length > 0) ? saved : `
 <fetch top="10">
-  <entity name="account">
-    <attribute name="name" />
-    <attribute name="accountid" />
-    <attribute name="emailaddress1" />
-    <attribute name="telephone1" />
-    <order attribute="name" />
-  </entity>
+    <entity name="account">
+        <attribute name="name" />
+        <attribute name="accountid" />
+        <attribute name="emailaddress1" />
+        <attribute name="telephone1" />
+        <order attribute="name" />
+    </entity>
 </fetch>
-        `.trim();
+                `.trim();
 
         const result = await dataverse.fetchXmlQuery(fetchXml);
 
@@ -583,6 +593,94 @@ function clearLog() {
     const logDiv = document.getElementById('event-log');
     if (logDiv) {
         logDiv.innerHTML = '';
+    }
+}
+
+// -----------------------------
+// Tool Settings helpers & demos
+// -----------------------------
+
+const SETTINGS_KEY = 'demo.fetchxml';
+
+async function getSetting<T = any>(key: string): Promise<T | undefined> {
+    try {
+        // Tool settings are scoped to the tool; implementation provided by the host app
+        // API shape (based on docs): toolbox.settings.get(key)
+        const value = await (toolbox as any).settings?.get?.(key);
+        return value as T | undefined;
+    } catch (error) {
+        log(`Error reading setting: ${(error as Error).message}`, 'error');
+        return undefined;
+    }
+}
+
+async function setSetting<T = any>(key: string, value: T): Promise<void> {
+    try {
+        await (toolbox as any).settings?.set?.(key, value);
+    } catch (error) {
+        log(`Error saving setting: ${(error as Error).message}`, 'error');
+        throw error;
+    }
+}
+
+async function deleteSetting(key: string): Promise<void> {
+    try {
+        if ((toolbox as any).settings?.delete) {
+            await (toolbox as any).settings.delete(key);
+        } else if ((toolbox as any).settings?.set) {
+            // Fallback to setting undefined/null if delete not available
+            await (toolbox as any).settings.set(key, undefined);
+        }
+    } catch (error) {
+        log(`Error clearing setting: ${(error as Error).message}`, 'error');
+        throw error;
+    }
+}
+
+async function loadToolSetting() {
+    const textarea = document.getElementById('settings-fetchxml') as HTMLTextAreaElement | null;
+    const output = document.getElementById('settings-output');
+    try {
+        const val = await getSetting<string>(SETTINGS_KEY);
+        if (textarea) textarea.value = val || '';
+        if (output) output.textContent = val ? 'Loaded saved FetchXML from settings.' : 'No saved FetchXML found.';
+        log('Loaded tool setting', 'info');
+    } catch (error) {
+        if (output) output.textContent = `Error loading setting: ${(error as Error).message}`;
+    }
+}
+
+async function saveToolSetting() {
+    const textarea = document.getElementById('settings-fetchxml') as HTMLTextAreaElement | null;
+    const output = document.getElementById('settings-output');
+    const value = (textarea?.value || '').trim();
+    if (!value) {
+        await showNotification('Nothing to save', 'Enter FetchXML before saving.', 'warning');
+        return;
+    }
+    try {
+        await setSetting(SETTINGS_KEY, value);
+        if (output) output.textContent = 'Saved FetchXML to tool settings.';
+        await showNotification('Setting Saved', 'Your FetchXML has been saved.', 'success');
+        log('Saved tool setting', 'success');
+    } catch (error) {
+        if (output) output.textContent = `Error saving setting: ${(error as Error).message}`;
+        await showNotification('Save Failed', (error as Error).message, 'error');
+    }
+}
+
+async function clearToolSetting() {
+    const output = document.getElementById('settings-output');
+    try {
+        await deleteSetting(SETTINGS_KEY);
+        const textarea = document.getElementById('settings-fetchxml') as HTMLTextAreaElement | null;
+        if (textarea) textarea.value = '';
+        if (output) output.textContent = 'Cleared saved FetchXML.';
+        await showNotification('Setting Cleared', 'Saved FetchXML removed.', 'success');
+        log('Cleared tool setting', 'success');
+    } catch (error) {
+        if (output) output.textContent = `Error clearing setting: ${(error as Error).message}`;
+        await showNotification('Clear Failed', (error as Error).message, 'error');
     }
 }
 

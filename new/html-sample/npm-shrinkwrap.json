@@ -1,12 +1,12 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "pptb-standard-sample-tool",
-            "version": "1.0.1",
+            "version": "1.0.4",
             "license": "GPL-3.0",
             "devDependencies": {
                 "@pptb/types": "^1.0.8",

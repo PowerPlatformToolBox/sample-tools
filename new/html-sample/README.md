@@ -11,6 +11,7 @@ This sample demonstrates:
   - Notifications (success, info, warning, error)
   - Clipboard operations
   - File save dialogs
+  - Tool settings storage (save/load/clear)
   - Theme detection
   - Terminal creation and command execution
   - Event subscription and handling
@@ -100,6 +101,7 @@ html-sample/
 **Query Records:**
 - FetchXML query to retrieve top 10 accounts
 - Display results with formatting
+- If a FetchXML is saved in Tool Settings, the Query button will use that instead of the default
 
 **CRUD Operations:**
 - Create new account records
@@ -173,6 +175,23 @@ try {
 ```
 
 In this HTML sample, the "Run Parallel Demo" button issues three light FetchXML queries simultaneously using `toolbox.utils.executeParallel`, and the "Run Loading Demo" button shows a loading overlay while either performing a quick query (if connected) or simulating work.
+
+### Tool Settings Storage
+
+Use the tool settings API to persist user preferences and configuration for your tool. This storage is scoped per tool.
+
+```typescript
+// Save a setting
+await toolboxAPI.settings.set('demo.fetchxml', myFetchXmlString);
+
+// Read a setting
+const saved = await toolboxAPI.settings.get('demo.fetchxml');
+
+// Delete a setting
+await toolboxAPI.settings.delete('demo.fetchxml');
+```
+
+In this sample, the “Tool Settings” section lets you save a FetchXML snippet. The “Query Top 10 Accounts” button will use the saved FetchXML if present, otherwise it falls back to the default.
 
 ### ToolBox API
 
