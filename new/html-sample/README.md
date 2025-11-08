@@ -148,6 +148,32 @@ const dataverse: typeof window.dataverseAPI = window.dataverseAPI;
 
 ## API Usage Examples
 
+### Advanced Utilities
+
+Below demonstrates using `executeParallel` to run multiple Dataverse operations concurrently, and wrapping work with `showLoading` / `hideLoading`:
+
+```typescript
+// Execute multiple operations in parallel
+const [account, contact, opportunities] = await toolboxAPI.utils.executeParallel(
+    dataverseAPI.retrieve('account', accountId, ['name']),
+    dataverseAPI.retrieve('contact', contactId, ['fullname']),
+    dataverseAPI.fetchXmlQuery(opportunityFetchXml)
+);
+console.log('All data fetched:', account, contact, opportunities);
+
+// Show loading screen during operations
+await toolboxAPI.utils.showLoading('Processing data...');
+try {
+    // Perform operations
+    await processData();
+} finally {
+    // Always hide loading
+    await toolboxAPI.utils.hideLoading();
+}
+```
+
+In this HTML sample, the "Run Parallel Demo" button issues three light FetchXML queries simultaneously using `toolbox.utils.executeParallel`, and the "Run Loading Demo" button shows a loading overlay while either performing a quick query (if connected) or simulating work.
+
 ### ToolBox API
 
 ```typescript

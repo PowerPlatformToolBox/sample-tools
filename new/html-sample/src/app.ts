@@ -162,6 +162,10 @@ function setupEventHandlers() {
 
     // Clear log button
     document.getElementById('clear-log-btn')?.addEventListener('click', clearLog);
+
+    // Advanced utilities demos
+    document.getElementById('parallel-demo-btn')?.addEventListener('click', demoExecuteParallel);
+    document.getElementById('loading-demo-btn')?.addEventListener('click', demoLoading);
 }
 
 /**
@@ -517,7 +521,8 @@ async function getContactMetadata() {
         const output = document.getElementById('metadata-output');
         if (output) output.textContent = 'Retrieving metadata...\n';
 
-        const metadata = await dataverse.getEntityMetadata('contact');
+    // Adjusted to match current API signature (logical name, includeAttributes?)
+    const metadata = await dataverse.getEntityMetadata('contact', true);
 
         if (output) {
             output.textContent = 'Contact Entity Metadata:\n\n';
@@ -578,6 +583,89 @@ function clearLog() {
     const logDiv = document.getElementById('event-log');
     if (logDiv) {
         logDiv.innerHTML = '';
+    }
+}
+
+/**
+ * Demonstrate executeParallel utility by performing three Dataverse operations in parallel.
+ * Falls back gracefully if no connection is available.
+ */
+async function demoExecuteParallel() {
+    const output = document.getElementById('parallel-output');
+    if (output) output.textContent = 'Running parallel operations...\n';
+
+    if (!currentConnection) {
+        if (output) output.textContent += 'No active Dataverse connection.\n';
+        await showNotification('No Connection', 'Connect to a Dataverse environment to run the parallel demo', 'warning');
+        return;
+    }
+
+    try {
+        // Prepare lightweight FetchXML queries (top 1 / top 3) for demo purposes
+        const accountFetchXml = `<fetch top="1"><entity name="account"><attribute name="name" /><attribute name="accountid" /></entity></fetch>`;
+        const contactFetchXml = `<fetch top="1"><entity name="contact"><attribute name="fullname" /><attribute name="contactid" /></entity></fetch>`;
+        const userFetchXml = `<fetch top="3"><entity name="systemuser"><attribute name="name" /><attribute name="systemuserid" /></entity></fetch>`;
+
+        log('Starting parallel Dataverse queries', 'info');
+
+        const [accounts, contacts, users] = await toolbox.utils.executeParallel(
+            dataverse.fetchXmlQuery(accountFetchXml),
+            dataverse.fetchXmlQuery(contactFetchXml),
+            dataverse.fetchXmlQuery(userFetchXml)
+        );
+
+        if (output) {
+            output.textContent += 'All operations completed!\n\n';
+            output.textContent += `Accounts Returned: ${accounts.value.length}\n`;
+            accounts.value.forEach((a: any) => output.textContent += ` • ${a.name} (${a.accountid})\n`);
+            output.textContent += `\nContacts Returned: ${contacts.value.length}\n`;
+            contacts.value.forEach((c: any) => output.textContent += ` • ${c.fullname} (${c.contactid})\n`);
+            output.textContent += `\nUsers Returned: ${users.value.length}\n`;
+            users.value.forEach((u: any) => output.textContent += ` • ${u.fullname} (${u.systemuserid})\n`);
+        }
+
+        await showNotification('Parallel Complete', 'Fetched accounts, contacts & users', 'success');
+        log('Parallel queries finished successfully', 'success');
+    } catch (error) {
+        if (output) output.textContent += `Error: ${(error as Error).message}\n`;
+        log(`Parallel query error: ${(error as Error).message}`, 'error');
+        await showNotification('Parallel Error', (error as Error).message, 'error');
+    }
+}
+
+/**
+ * Demonstrate showLoading/hideLoading utilities wrapping async work.
+ */
+async function demoLoading() {
+    const output = document.getElementById('parallel-output');
+    if (output) output.textContent = 'Showing loading screen...\n';
+
+    try {
+        await toolbox.utils.showLoading('Processing data...');
+        log('Loading screen displayed', 'info');
+
+        // Simulate async work or perform a lightweight query
+        if (currentConnection) {
+            const fetchXml = `<fetch top="2"><entity name="account"><attribute name="name" /></entity></fetch>`;
+            const result = await dataverse.fetchXmlQuery(fetchXml);
+            if (output) {
+                output.textContent += `Fetched ${result.value.length} account(s) during loading:\n`;
+                result.value.forEach((a: any) => output.textContent += ` • ${a.name}\n`);
+            }
+        } else {
+            // Fallback simulated delay
+            await new Promise(r => setTimeout(r, 1500));
+            if (output) output.textContent += 'Simulated work (no connection).\n';
+        }
+    } catch (error) {
+        if (output) output.textContent += `Error during loading demo: ${(error as Error).message}\n`;
+        log(`Loading demo error: ${(error as Error).message}`, 'error');
+        await showNotification('Loading Demo Error', (error as Error).message, 'error');
+    } finally {
+        await toolbox.utils.hideLoading();
+        if (output) output.textContent += '\nLoading screen hidden.';
+        log('Loading screen hidden', 'info');
+        await showNotification('Loading Complete', 'Demo finished', 'success');
     }
 }
 
