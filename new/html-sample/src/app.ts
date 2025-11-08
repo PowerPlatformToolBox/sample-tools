@@ -604,7 +604,7 @@ async function demoExecuteParallel() {
         // Prepare lightweight FetchXML queries (top 1 / top 3) for demo purposes
         const accountFetchXml = `<fetch top="1"><entity name="account"><attribute name="name" /><attribute name="accountid" /></entity></fetch>`;
         const contactFetchXml = `<fetch top="1"><entity name="contact"><attribute name="fullname" /><attribute name="contactid" /></entity></fetch>`;
-        const userFetchXml = `<fetch top="3"><entity name="systemuser"><attribute name="name" /><attribute name="systemuserid" /></entity></fetch>`;
+        const userFetchXml = `<fetch top="3"><entity name="systemuser"><attribute name="fullname" /><attribute name="systemuserid" /></entity></fetch>`;
 
         log('Starting parallel Dataverse queries', 'info');
 
