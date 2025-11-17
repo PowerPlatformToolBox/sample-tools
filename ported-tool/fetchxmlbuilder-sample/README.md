@@ -275,5 +275,5 @@ GPL-3.0 - Same as Power Platform Tool Box
 
 ## Questions?
 
-- Open an issue in the [PPTB GitHub repository](https://github.com/PowerPlatform-ToolBox/desktop-app)
-- Check the [discussions board](https://github.com/PowerPlatform-ToolBox/desktop-app/discussions)
+- Open an issue in the [PPTB GitHub repository](https://github.com/PowerPlatformToolBox/desktop-app)
+- Check the [discussions board](https://github.com/PowerPlatformToolBox/desktop-app/discussions)
