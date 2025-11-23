@@ -173,7 +173,6 @@ function setupEventHandlers() {
     // Settings buttons
     document.getElementById('load-setting-btn')?.addEventListener('click', loadToolSetting);
     document.getElementById('save-setting-btn')?.addEventListener('click', saveToolSetting);
-    document.getElementById('clear-setting-btn')?.addEventListener('click', clearToolSetting);
 }
 
 /**
@@ -606,7 +605,7 @@ async function getSetting<T = any>(key: string): Promise<T | undefined> {
     try {
         // Tool settings are scoped to the tool; implementation provided by the host app
         // API shape (based on docs): toolbox.settings.get(key)
-        const value = await (toolbox as any).settings?.get?.(key);
+        const value = await (toolbox as any).settings?.getSettings?.(key);
         return value as T | undefined;
     } catch (error) {
         log(`Error reading setting: ${(error as Error).message}`, 'error');
@@ -616,23 +615,9 @@ async function getSetting<T = any>(key: string): Promise<T | undefined> {
 
 async function setSetting<T = any>(key: string, value: T): Promise<void> {
     try {
-        await (toolbox as any).settings?.set?.(key, value);
+        await (toolbox as any).settings?.setSetting?.(key, value);
     } catch (error) {
         log(`Error saving setting: ${(error as Error).message}`, 'error');
-        throw error;
-    }
-}
-
-async function deleteSetting(key: string): Promise<void> {
-    try {
-        if ((toolbox as any).settings?.delete) {
-            await (toolbox as any).settings.delete(key);
-        } else if ((toolbox as any).settings?.set) {
-            // Fallback to setting undefined/null if delete not available
-            await (toolbox as any).settings.set(key, undefined);
-        }
-    } catch (error) {
-        log(`Error clearing setting: ${(error as Error).message}`, 'error');
         throw error;
     }
 }
@@ -666,21 +651,6 @@ async function saveToolSetting() {
     } catch (error) {
         if (output) output.textContent = `Error saving setting: ${(error as Error).message}`;
         await showNotification('Save Failed', (error as Error).message, 'error');
-    }
-}
-
-async function clearToolSetting() {
-    const output = document.getElementById('settings-output');
-    try {
-        await deleteSetting(SETTINGS_KEY);
-        const textarea = document.getElementById('settings-fetchxml') as HTMLTextAreaElement | null;
-        if (textarea) textarea.value = '';
-        if (output) output.textContent = 'Cleared saved FetchXML.';
-        await showNotification('Setting Cleared', 'Saved FetchXML removed.', 'success');
-        log('Cleared tool setting', 'success');
-    } catch (error) {
-        if (output) output.textContent = `Error clearing setting: ${(error as Error).message}`;
-        await showNotification('Clear Failed', (error as Error).message, 'error');
     }
 }
 
