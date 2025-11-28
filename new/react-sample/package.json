@@ -1,19 +1,21 @@
 {
     "name": "pptb-react-sample-tool",
-    "version": "0.2.12",
+    "version": "0.2.15",
     "displayName": "React Sample Tool",
-    "description": "A sample Power Platform Tool Box tool built with React, Vite, and TypeScript",
-    "main": "index.html",
-    "author": "Power Platform Tool Box",
-    "keywords": [
-        "powerplatform",
-        "dataverse",
-        "toolbox",
-        "pptb",
-        "sample",
-        "react"
+    "description": "A sample Power Platform Tool Box tool built with React",
+    "contributors": [
+        {
+            "name": "Power Platform Tool Box",
+            "url": "https://github.com/PowerPlatformToolBox/sample-tools"
+        }
     ],
     "license": "GPL-3.0",
+    "configurations": {
+        "repository": "https://github.com/PowerPlatformToolBox/sample-tools",
+        "website": "https://powerplatformtoolbox.com",
+        "readmeUrl": "https://raw.githubusercontent.com/PowerPlatformToolBox/sample-tools/refs/heads/main/new/react-sample/README.md"
+    },
+    "main": "index.html",
     "repository": {
         "type": "git",
         "url": "https://github.com/PowerPlatform-ToolBox/desktop-app.git",
