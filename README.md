@@ -262,7 +262,7 @@ Each sample follows a consistent structure:
 - **[Tool Development Guide](../docs/TOOL_DEVELOPMENT.md)** - Complete guide to building tools
 - **[API Reference](../packages/README.md)** - Full API documentation
 - **[Architecture Guide](../docs/ARCHITECTURE.md)** - System architecture overview
-- **[Main Repository](https://github.com/PowerPlatform-ToolBox/desktop-app)** - Source code and issues
+- **[Main Repository](https://github.com/PowerPlatformToolBox/desktop-app)** - Source code and issues
 
 ---
 
@@ -288,8 +288,8 @@ All samples are licensed under GPL-3.0. See [LICENSE](../LICENSE) for details.
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/PowerPlatform-ToolBox/desktop-app/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/PowerPlatform-ToolBox/desktop-app/discussions)
+- **Issues**: [GitHub Issues](https://github.com/PowerPlatformToolBox/desktop-app/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/PowerPlatformToolBox/desktop-app/discussions)
 - **Documentation**: [docs/](../docs/)
 
 ---
