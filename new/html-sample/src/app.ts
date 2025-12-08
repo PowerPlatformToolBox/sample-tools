@@ -605,7 +605,7 @@ async function getSetting<T = any>(key: string): Promise<T | undefined> {
     try {
         // Tool settings are scoped to the tool; implementation provided by the host app
         // API shape (based on docs): toolbox.settings.get(key)
-        const value = await (toolbox as any).settings?.getSettings?.(key);
+        const value = await (toolbox as any).settings?.get?.(key);
         return value as T | undefined;
     } catch (error) {
         log(`Error reading setting: ${(error as Error).message}`, 'error');
@@ -615,7 +615,7 @@ async function getSetting<T = any>(key: string): Promise<T | undefined> {
 
 async function setSetting<T = any>(key: string, value: T): Promise<void> {
     try {
-        await (toolbox as any).settings?.setSetting?.(key, value);
+        await (toolbox as any).settings?.set?.(key, value);
     } catch (error) {
         log(`Error saving setting: ${(error as Error).message}`, 'error');
         throw error;
@@ -627,6 +627,7 @@ async function loadToolSetting() {
     const output = document.getElementById('settings-output');
     try {
         const val = await getSetting<string>(SETTINGS_KEY);
+        debugger;
         if (textarea) textarea.value = val || '';
         if (output) output.textContent = val ? 'Loaded saved FetchXML from settings.' : 'No saved FetchXML found.';
         log('Loaded tool setting', 'info');
