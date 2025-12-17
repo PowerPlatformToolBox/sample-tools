@@ -1,15 +1,15 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.0.4",
+    "version": "1.0.8",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "pptb-standard-sample-tool",
-            "version": "1.0.4",
+            "version": "1.0.8",
             "license": "GPL-3.0",
             "devDependencies": {
-                "@pptb/types": "^1.0.8",
+                "@pptb/types": "^1.0.11",
                 "shx": "^0.4.0",
                 "typescript": "^5.0.0"
             },
@@ -56,9 +56,9 @@
             }
         },
         "node_modules/@pptb/types": {
-            "version": "1.0.8",
-            "resolved": "https://registry.npmjs.org/@pptb/types/-/types-1.0.8.tgz",
-            "integrity": "sha512-qGjif4qCFvGsHFB4Ly0xcvfTMkr+IB9WXh2/Zn0/C//orX6IBpnlSXn2D3xUjj69a9hAiqjVMhNJ1fpJJNqO7g==",
+            "version": "1.0.11",
+            "resolved": "https://registry.npmjs.org/@pptb/types/-/types-1.0.11.tgz",
+            "integrity": "sha512-Sgzl4az106T7GmDuobZUy35NccGTXXOGY250AI2rSEz6soYTXdO7azxzdfKyVUwEhoprlfhfdAdhpjU0ruo8rg==",
             "dev": true,
             "license": "GPL-3.0"
         },

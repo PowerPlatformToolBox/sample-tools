@@ -17,6 +17,7 @@ const dataverse = window.dataverseAPI;
 
 // Application state
 let currentConnection: ToolBoxAPI.DataverseConnection | null = null;
+let secondaryConnection: ToolBoxAPI.DataverseConnection | null = null;
 let currentTerminal: ToolBoxAPI.Terminal | null = null;
 let createdId: string | null = null;
 
@@ -54,6 +55,7 @@ async function initialize() {
 async function refreshConnection() {
     try {
         currentConnection = await toolbox.connections.getActiveConnection();
+        secondaryConnection = await toolbox.connections.getSecondaryConnection();
 
         const connectionInfo = document.getElementById('connection-info');
         if (!connectionInfo) return;
@@ -86,6 +88,42 @@ async function refreshConnection() {
             connectionInfo.className = 'info-box warning';
             connectionInfo.innerHTML = '<p><strong>⚠️ No active connection</strong><br>Please connect to a Dataverse environment to use this tool.</p>';
             log('No active connection found', 'warning');
+        }
+
+        if(secondaryConnection){
+            const secondaryInfo = document.getElementById('secondary-connection-info');
+            if (!secondaryInfo) return;
+
+            const envClass = secondaryConnection.environment.toLowerCase();
+            secondaryInfo.className = 'info-box success';
+            secondaryInfo.innerHTML = `
+                <div class="connection-details">
+                    <div class="connection-item">
+                        <strong>Name:</strong>
+                        <span>${secondaryConnection.name}</span>
+                    </div>
+                    <div class="connection-item">
+                        <strong>URL:</strong>
+                        <span>${secondaryConnection.url}</span>
+                    </div>
+                    <div class="connection-item">
+                        <strong>Environment:</strong>
+                        <span class="env-badge ${envClass}">${secondaryConnection.environment}</span>
+                    </div>
+                    <div class="connection-item">
+                        <strong>ID:</strong>
+                        <span>${secondaryConnection.id}</span>
+                    </div>
+                </div>
+            `;
+            log(`Secondary connection: ${secondaryConnection.name}`, 'success');
+        } else {
+            const secondaryInfo = document.getElementById('secondary-connection-info');
+            if (!secondaryInfo) return;
+
+            secondaryInfo.className = 'info-box warning';
+            secondaryInfo.innerHTML = '<p><strong>⚠️ No secondary connection</strong><br>Please connect to a secondary Dataverse environment to use this tool.</p>';
+            log('No secondary connection found', 'warning');
         }
     } catch (error) {
         log(`Error refreshing connection: ${(error as Error).message}`, 'error');
