@@ -18,6 +18,7 @@ This sample demonstrates:
 
 - ✅ **Dataverse API Usage**
   - FetchXML queries
+  - Multi-connection queries (primary and secondary)
   - CRUD operations (Create, Read, Update, Delete)
   - Entity metadata retrieval
   - Error handling
@@ -102,6 +103,7 @@ html-sample/
 - FetchXML query to retrieve top 10 accounts
 - Display results with formatting
 - If a FetchXML is saved in Tool Settings, the Query button will use that instead of the default
+ - This sample supports multi-connection: try the "Secondary" buttons to run the same queries against the secondary connection
 
 **CRUD Operations:**
 - Create new account records
@@ -230,6 +232,16 @@ const result = await dataverse.fetchXmlQuery(`
     </fetch>
 `);
 
+// Query with FetchXML targeting the secondary connection
+const secondaryResult = await dataverse.fetchXmlQuery(`
+    <fetch top="5">
+        <entity name="account">
+            <attribute name="name" />
+            <order attribute="name" />
+        </entity>
+    </fetch>
+`, 'secondary');
+
 // Create record
 const account = await dataverse.create('account', {
     name: 'Contoso Ltd',
@@ -246,6 +258,9 @@ await dataverse.delete('account', accountId);
 
 // Get metadata
 const metadata = await dataverse.getEntityMetadata('account');
+
+// Get metadata on secondary
+const metadataSecondary = await dataverse.getEntityMetadata('account', true, ['LogicalName'], 'secondary');
 ```
 
 ## Troubleshooting

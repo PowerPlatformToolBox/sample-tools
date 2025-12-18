@@ -1,6 +1,6 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.0.8",
+    "version": "1.0.10",
     "displayName": "HTML Sample Tool",
     "description": "A sample Power Platform Tool Box tool built with HTML, CSS, and TypeScript",
     "main": "index.html",

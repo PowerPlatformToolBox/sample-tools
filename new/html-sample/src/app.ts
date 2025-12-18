@@ -192,6 +192,7 @@ function setupEventHandlers() {
 
     // Dataverse query button
     document.getElementById('query-accounts-btn')?.addEventListener('click', queryAccounts);
+    document.getElementById('query-accounts-secondary-btn')?.addEventListener('click', queryAccountsSecondary);
 
     // CRUD buttons
     document.getElementById('create-contact-btn')?.addEventListener('click', createContact);
@@ -437,6 +438,55 @@ async function queryAccounts() {
         const output = document.getElementById('query-output');
         if (output) output.textContent = `Error: ${(error as Error).message}`;
         log(`Error querying accounts: ${(error as Error).message}`, 'error');
+    }
+}
+
+/**
+ * Query accounts from Dataverse using the secondary connection (FetchXML)
+ */
+async function queryAccountsSecondary() {
+    if (!secondaryConnection) {
+        await showNotification('No Secondary Connection', 'Please configure a secondary Dataverse connection', 'warning');
+        return;
+    }
+
+    try {
+        const output = document.getElementById('query-output-secondary');
+        if (output) output.textContent = 'Querying accounts using secondary connection...\n';
+
+        // Use saved FetchXML if present, otherwise default
+        const saved = await getSetting<string>('demo.fetchxml');
+        const fetchXml = (saved && saved.trim().length > 0) ? saved : `
+<fetch top="10">
+    <entity name="account">
+        <attribute name="name" />
+        <attribute name="accountid" />
+        <attribute name="emailaddress1" />
+        <attribute name="telephone1" />
+        <order attribute="name" />
+    </entity>
+</fetch>
+        `.trim();
+
+        // Pass 'secondary' to target the secondary connection
+        const result = await dataverse.fetchXmlQuery(fetchXml, 'secondary');
+
+        if (output) {
+            output.textContent = `Found ${result.value.length} account(s) on secondary:\n\n`;
+            result.value.forEach((account: any, index: number) => {
+                output.textContent += `${index + 1}. ${account.name}\n`;
+                output.textContent += `   ID: ${account.accountid}\n`;
+                if ((account as any).emailaddress1) output.textContent += `   Email: ${(account as any).emailaddress1}\n`;
+                if ((account as any).telephone1) output.textContent += `   Phone: ${(account as any).telephone1}\n`;
+                output.textContent += '\n';
+            });
+        }
+
+        log(`Queried ${result.value.length} accounts on secondary`, 'success');
+    } catch (error) {
+        const output = document.getElementById('query-output-secondary');
+        if (output) output.textContent = `Error (secondary): ${(error as Error).message}`;
+        log(`Error querying accounts (secondary): ${(error as Error).message}`, 'error');
     }
 }
 
