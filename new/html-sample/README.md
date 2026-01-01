@@ -290,7 +290,7 @@ If connection is null:
 
 - [Tool Development Guide](../../docs/TOOL_DEVELOPMENT.md)
 - [API Reference](../../packages/README.md)
-- [Power Platform Tool Box Repository](https://github.com/PowerPlatform-ToolBox/desktop-app)
+- [Power Platform Tool Box Repository](https://github.com/PowerPlatformToolBox/desktop-app)
 
 ## License
 
