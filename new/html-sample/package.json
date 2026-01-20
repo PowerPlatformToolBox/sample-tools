@@ -31,7 +31,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/PowerPlatform-ToolBox/desktop-app.git",
+        "url": "https://github.com/PowerPlatformToolBox/desktop-app.git",
         "directory": "sample/html-sample"
     },
     "engines": {
