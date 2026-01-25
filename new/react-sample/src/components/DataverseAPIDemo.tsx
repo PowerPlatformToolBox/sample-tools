@@ -239,7 +239,7 @@ export const DataverseAPIDemo: React.FC<DataverseAPIDemoProps> = ({ connection, 
       });
 
       setMetadataOutput(output);
-      onLog("Account metadata retrieved", "success");
+      onLog("Contact attributes metadata retrieved", "success");
     } catch (error) {
       const errorMsg = `Error: ${(error as Error).message}`;
       setMetadataOutput(errorMsg);

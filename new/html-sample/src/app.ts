@@ -479,7 +479,6 @@ async function queryContactQueryData() {
     if (output) output.textContent += "Using QueryData:\n" + queryString + "\n\n";
 
     const result = await window.dataverseAPI.queryData(queryString);
-    console.log("QueryData result:", result);
     if (output) output.textContent += `Found ${result.value.length} contact(s):\n\n`;
     result.value.forEach((contact: any, index: number) => {
       if (output) {
@@ -490,8 +489,6 @@ async function queryContactQueryData() {
         output.textContent += "\n";
       }
     });
-
-    if (output) output.textContent += output.textContent;
     log(`Queried ${result.value.length} contacts`, "success");
   } catch (error) {
     const errorMsg = `Error: ${(error as Error).message}`;
@@ -859,7 +856,6 @@ async function loadToolSetting() {
   const output = document.getElementById("settings-output");
   try {
     const val = await getSetting<string>(SETTINGS_KEY);
-    debugger;
     if (textarea) textarea.value = val || "";
     if (output) output.textContent = val ? "Loaded saved FetchXML from settings." : "No saved FetchXML found.";
     log("Loaded tool setting", "info");
