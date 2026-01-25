@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Sample Tool</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -31,7 +33,7 @@
         <!-- ToolBox API Examples -->
         <section class="card">
             <h2>🛠️ ToolBox API Examples</h2>
-            
+
             <div class="example-group">
                 <h3>Notifications</h3>
                 <div class="button-group">
@@ -39,6 +41,7 @@
                     <button id="show-info-btn" class="btn btn-info">Show Info</button>
                     <button id="show-warning-btn" class="btn btn-warning">Show Warning</button>
                     <button id="show-error-btn" class="btn btn-error">Show Error</button>
+                    <button id="show-loading-btn" class="btn btn-secondary">Show Loading</button>
                 </div>
             </div>
 
@@ -53,7 +56,9 @@
 
             <div class="example-group">
                 <h3>Advanced Utilities</h3>
-                <p style="margin:4px 0 8px; font-size:12px; opacity:.8;">Demonstrates <code>executeParallel</code>, <code>showLoading</code> & <code>hideLoading</code>.</p>
+                <p style="margin:4px 0 8px; font-size:12px; opacity:.8;">Demonstrates <code>executeParallel</code>,
+                    <code>showLoading</code> & <code>hideLoading</code>.
+                </p>
                 <div class="button-group">
                     <button id="parallel-demo-btn" class="btn btn-primary">Run Parallel Demo</button>
                     <button id="loading-demo-btn" class="btn btn-secondary">Run Loading Demo</button>
@@ -78,10 +83,13 @@
 
             <div class="example-group">
                 <h3>Tool Settings</h3>
-                <p style="margin:4px 0 10px;font-size:12px;opacity:.85">Persist simple configuration values per tool instance using the Tool Settings storage API.</p>
+                <p style="margin:4px 0 10px;font-size:12px;opacity:.85">Persist simple configuration values per tool
+                    instance using the Tool Settings storage API.</p>
                 <div class="input-group">
                     <label for="settings-fetchxml">Saved FetchXML (used for Account Query demo if present):</label>
-                    <textarea id="settings-fetchxml" style="width:100%;min-height:110px;padding:10px;border:2px solid #e0e0e0;border-radius:6px;font-family:monospace;font-size:12px;line-height:1.4" placeholder="Enter FetchXML here and click Save Setting"></textarea>
+                    <textarea id="settings-fetchxml"
+                        style="width:100%;min-height:110px;padding:10px;border:2px solid #e0e0e0;border-radius:6px;font-family:monospace;font-size:12px;line-height:1.4"
+                        placeholder="Enter FetchXML here and click Save Setting"></textarea>
                 </div>
                 <div class="button-group">
                     <button id="load-setting-btn" class="btn">Load Setting</button>
@@ -89,12 +97,13 @@
                 </div>
                 <div id="settings-output" class="output"></div>
             </div>
-            
+
             <div class="example-group">
                 <h3>Query Records</h3>
                 <div class="button-group">
                     <button id="query-accounts-btn" class="btn btn-primary">Query Top 10 Accounts (Primary)</button>
                     <button id="query-accounts-secondary-btn" class="btn">Query Top 10 Accounts (Secondary)</button>
+                    <button id="query-contacts-querydata-btn" class="btn">Query Top 10 Contacts (Primary)</button>
                 </div>
                 <div id="query-output" class="output"></div>
                 <div id="query-output-secondary" class="output"></div>
@@ -121,18 +130,27 @@
             <div class="example-group">
                 <h3>Metadata</h3>
                 <button id="get-metadata-btn" class="btn">Get Contact Metadata</button>
+                <button id="get-metadata-attributes" class="btn">Get Account Attributes Metadata</button>
+                <button id="get-metadata-allentities" class="btn">Get All Entities Metadata</button>
                 <div id="metadata-output" class="output"></div>
             </div>
-        </section>
 
-        <!-- Event Log -->
-        <section class="card">
-            <h2>📋 Event Log</h2>
-            <button id="clear-log-btn" class="btn btn-secondary">Clear Log</button>
-            <div id="event-log" class="log"></div>
-        </section>
+    <div class="example-group">
+        <h3>Execute Actions</h3>
+        <button id="whoami-btn" class="btn">Execute WhoAmI</button>
+        <div id="execute-output" class="output"></div>
+    </div>
+    </section>
+
+    <!-- Event Log -->
+    <section class="card">
+        <h2>📋 Event Log</h2>
+        <button id="clear-log-btn" class="btn btn-secondary">Clear Log</button>
+        <div id="event-log" class="log"></div>
+    </section>
     </div>
 
     <script src="app.js" type="module"></script>
 </body>
+
 </html>
