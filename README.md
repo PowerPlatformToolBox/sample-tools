@@ -5,11 +5,13 @@ This directory contains complete, production-ready sample tools demonstrating ho
 ## Available Samples
 
 ### 1. HTML Sample (`html-sample/`)
+
 **Technology**: HTML, CSS, TypeScript
 
 A vanilla TypeScript implementation demonstrating tool development without any framework dependencies.
 
 **Key Features**:
+
 - Pure TypeScript with no framework overhead
 - Modern ES2022 features
 - Clean separation of concerns
@@ -17,16 +19,18 @@ A vanilla TypeScript implementation demonstrating tool development without any f
 
 **Best For**: Lightweight tools, simple utilities, learning the API basics
 
-[→ View HTML Sample Documentation](./html-sample/README.md)
+[→ View HTML Sample Documentation](./new/html-sample/README.md)
 
 ---
 
 ### 2. React Sample (`react-sample/`)
+
 **Technology**: React 18, TypeScript, Vite
 
 A modern React application using hooks and functional components.
 
 **Key Features**:
+
 - React 18 with concurrent features
 - Custom hooks for API integration
 - Component-based architecture
@@ -35,16 +39,18 @@ A modern React application using hooks and functional components.
 
 **Best For**: Complex interactive tools, data visualization, tools requiring rich UI
 
-[→ View React Sample Documentation](./react-sample/README.md)
+[→ View React Sample Documentation](./new/react-sample/README.md)
 
 ---
 
 ### 3. Vue Sample (`vue-sample/`)
+
 **Technology**: Vue 3, Composition API, TypeScript, Vite
 
 A Vue 3 application using the Composition API and Single File Components.
 
 **Key Features**:
+
 - Vue 3 with Composition API
 - `<script setup>` syntax for cleaner code
 - Reactive composables
@@ -53,16 +59,18 @@ A Vue 3 application using the Composition API and Single File Components.
 
 **Best For**: Progressive web apps, form-heavy tools, tools requiring two-way data binding
 
-[→ View Vue Sample Documentation](./vue-sample/README.md)
+[→ View Vue Sample Documentation](./new/vue-sample/README.md)
 
 ---
 
 ### 4. Svelte Sample (`svelte-sample/`)
+
 **Technology**: Svelte 5, TypeScript, Vite
 
 A Svelte application leveraging Svelte's compiler-based reactivity.
 
 **Key Features**:
+
 - Svelte 5 with modern reactivity
 - Minimal runtime overhead
 - Built-in reactivity (no virtual DOM)
@@ -71,7 +79,7 @@ A Svelte application leveraging Svelte's compiler-based reactivity.
 
 **Best For**: Performance-critical tools, embedded tools, tools with limited screen space
 
-[→ View Svelte Sample Documentation](./svelte-sample/README.md)
+[→ View Svelte Sample Documentation](./new/svelte-sample/README.md)
 
 ---
 
@@ -80,28 +88,31 @@ A Svelte application leveraging Svelte's compiler-based reactivity.
 All samples include comprehensive examples of:
 
 ### ToolBox API Integration
+
 ✅ Connection management with real-time updates  
 ✅ Notification system (success, info, warning, error)  
 ✅ Clipboard operations  
 ✅ File save/load dialogs  
 ✅ Theme detection (light/dark)  
 ✅ Terminal creation and command execution  
-✅ Event subscription and handling  
+✅ Event subscription and handling
 
 ### Dataverse API Integration
+
 ✅ FetchXML query execution  
 ✅ CRUD operations (Create, Read, Update, Delete)  
 ✅ Entity metadata retrieval  
-✅ Error handling and validation  
+✅ Error handling and validation
 
 ### Development Best Practices
+
 ✅ TypeScript with full type safety (`@pptb/types`)  
 ✅ Modern build tooling (Vite)  
 ✅ Component-based architecture  
 ✅ State management patterns  
 ✅ Event-driven architecture  
 ✅ Responsive UI design  
-✅ Production-ready builds  
+✅ Production-ready builds
 
 ### Build Configuration for PPTB Compatibility
 
@@ -110,31 +121,36 @@ Framework samples (React, Vue, Svelte) use Vite with special configuration for P
 ✅ **IIFE Format**: Builds use Immediately Invoked Function Expression instead of ES modules for compatibility with PPTB's iframe loading mechanism  
 ✅ **Single Bundle**: All code and CSS bundled into one file to avoid module loading issues  
 ✅ **HTML Optimization**: Custom plugin that:
-   - Removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
-   - Moves script tags to end of `<body>` so DOM elements are available when IIFE executes  
-✅ **No External Dependencies**: All dependencies bundled together for standalone execution
+
+- Removes `type="module"` and `crossorigin` attributes for proper loading with `file://` URLs
+- Moves script tags to end of `<body>` so DOM elements are available when IIFE executes  
+  ✅ **No External Dependencies**: All dependencies bundled together for standalone execution
 
 ---
 
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18 or higher
 - Power Platform Tool Box desktop application
 
 ### Installation Steps
 
 1. **Navigate to sample directory**:
+
    ```bash
    cd sample/[html|react|vue|svelte]-sample
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Build the sample**:
+
    ```bash
    npm run build
    ```
@@ -150,24 +166,28 @@ Framework samples (React, Vue, Svelte) use Vite with special configuration for P
 ## Choosing the Right Framework
 
 ### Choose **HTML/TypeScript** if you:
+
 - Want minimal dependencies
 - Need the smallest possible bundle size
 - Are building a simple utility tool
 - Want to learn the API without framework complexity
 
 ### Choose **React** if you:
+
 - Need rich, complex user interfaces
 - Want to leverage the React ecosystem
 - Are familiar with React patterns
 - Need extensive third-party component libraries
 
 ### Choose **Vue** if you:
+
 - Want a progressive framework
 - Prefer template-based syntax
 - Need strong TypeScript support
 - Want excellent documentation and tooling
 
 ### Choose **Svelte** if you:
+
 - Want the smallest runtime bundle
 - Need maximum performance
 - Prefer compiler-based reactivity
@@ -177,36 +197,42 @@ Framework samples (React, Vue, Svelte) use Vite with special configuration for P
 
 ## Sample Comparison
 
-| Feature | HTML | React | Vue | Svelte |
-|---------|------|-------|-----|--------|
-| **Bundle Size** | ~50KB | ~158KB | ~77KB | ~45KB |
-| **Runtime Overhead** | Minimal | Medium | Medium | Minimal |
-| **Learning Curve** | Easy | Moderate | Easy | Easy |
-| **TypeScript Support** | Excellent | Excellent | Excellent | Excellent |
-| **Build Time** | Fast | Fast | Fast | Fast |
-| **HMR Support** | No | Yes | Yes | Yes |
-| **Ecosystem** | Standard Web | Large | Large | Growing |
+| Feature                | HTML         | React     | Vue       | Svelte    |
+| ---------------------- | ------------ | --------- | --------- | --------- |
+| **Bundle Size**        | ~50KB        | ~158KB    | ~77KB     | ~45KB     |
+| **Runtime Overhead**   | Minimal      | Medium    | Medium    | Minimal   |
+| **Learning Curve**     | Easy         | Moderate  | Easy      | Easy      |
+| **TypeScript Support** | Excellent    | Excellent | Excellent | Excellent |
+| **Build Time**         | Fast         | Fast      | Fast      | Fast      |
+| **HMR Support**        | No           | Yes       | Yes       | Yes       |
+| **Ecosystem**          | Standard Web | Large     | Large     | Growing   |
 
-*Bundle sizes for HTML sample include compiled TypeScript; framework samples are IIFE bundles with all features included*
+_Bundle sizes for HTML sample include compiled TypeScript; framework samples are IIFE bundles with all features included_
 
 ---
 
 ## Development Workflow
 
 ### Development Mode (React/Vue/Svelte only)
+
 ```bash
 npm run dev
 ```
+
 Starts development server with hot module replacement. Note: ToolBox APIs are only available when loaded within the application.
 
 ### Production Build
+
 ```bash
 npm run build
 ```
+
 Creates optimized production build in `dist/` directory.
 
 ### Type Checking
+
 All samples include TypeScript for type safety:
+
 ```bash
 # React/Vue/Svelte
 npm run check  # or tsc for HTML
@@ -240,18 +266,22 @@ Each sample follows a consistent structure:
 ## Common Issues & Solutions
 
 ### Build Errors
+
 **Problem**: TypeScript errors during build  
 **Solution**: Ensure all dependencies are installed with `npm install`
 
 ### API Not Available
+
 **Problem**: `window.toolboxAPI` is undefined  
 **Solution**: The tool must be loaded within Power Platform Tool Box, not a standalone browser
 
 ### Connection Null
+
 **Problem**: Connection is always null  
 **Solution**: Create a connection in Power Platform Tool Box first
 
 ### HMR Not Working
+
 **Problem**: Changes don't reflect immediately  
 **Solution**: Restart dev server with `npm run dev`
 
@@ -268,7 +298,7 @@ Each sample follows a consistent structure:
 
 ## Contributing
 
-Found an issue or want to improve the samples? 
+Found an issue or want to improve the samples?
 
 1. Fork the repository
 2. Create a feature branch
