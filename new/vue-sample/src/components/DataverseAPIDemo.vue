@@ -293,7 +293,7 @@ const executeWhoAmI = async () => {
 
     actionsOutput.value = `Logged in as \n\nUser ID: ${result.UserId}\nBusiness Unit ID: ${result.BusinessUnitId}\nOrganization ID: ${result.OrganizationId}\n`;
 
-    emit("log", `Executed WhoAmI action, User ID: ${result.userId}`, "info");
+    emit("log", `Executed WhoAmI action, User ID: ${result.UserId}`, "info");
   } catch (error) {
     emit("log", `Error executing WhoAmI action: ${(error as Error).message}`, "error");
   }
