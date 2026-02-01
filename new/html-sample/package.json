@@ -1,57 +1,57 @@
 {
-  "name": "pptb-standard-sample-tool",
-  "version": "1.0.10",
-  "displayName": "HTML Sample Tool",
-  "description": "A sample Power Platform Tool Box tool built with HTML, CSS, and TypeScript",
-  "main": "index.html",
-  "author": "Power Platform Tool Box",
-  "keywords": [
-    "powerplatform",
-    "dataverse",
-    "toolbox",
-    "pptb",
-    "sample",
-    "html"
-  ],
-  "license": "GPL-3.0",
-  "contributors": [
-    {
-      "name": "Power Platform Tool Box",
-      "url": "https://github.com/PowerPlatform-ToolBox"
-    }
-  ],
-  "configurations": {
-    "repository": "https://github.com/PowerPlatform-ToolBox/html-sample",
-    "website": "https://powerplatformtoolbox.com",
-    "iconUrl": "https://raw.githubusercontent.com/PowerPlatformToolBox/sample-tools/refs/heads/main/new/html-sample/icon/sample-icon.png",
-    "readmeUrl": "https://raw.githubusercontent.com/PowerPlatformToolBox/sample-tools/refs/heads/main/new/html-sample/README.md"
-  },
-  "features": {
-    "multiConnection": "optional"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/PowerPlatformToolBox/desktop-app.git",
-    "directory": "sample/html-sample"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "scripts": {
-    "build": "tsc && npm run copy-html && npm run copy-css",
-    "copy-html": "shx cp src/index.html dist/",
-    "copy-css": "shx cp src/styles.css dist/",
-    "finalize-package": "npm shrinkwrap",
-    "watch": "tsc --watch"
-  },
-  "devDependencies": {
-    "@pptb/types": "^1.0.17",
-    "shx": "^0.4.0",
-    "typescript": "^5.0.0"
-  },
-  "files": [
-    "dist",
-    "icon",
-    "npm-shrinkwrap.json"
-  ]
+    "name": "pptb-standard-sample-tool",
+    "version": "1.0.12",
+    "displayName": "HTML Sample Tool",
+    "description": "A sample Power Platform ToolBox tool built with HTML, CSS, and TypeScript",
+    "main": "index.html",
+    "author": "Power Platform ToolBox",
+    "keywords": [
+        "powerplatform",
+        "dataverse",
+        "toolbox",
+        "pptb",
+        "sample",
+        "html"
+    ],
+    "license": "GPL-3.0",
+    "contributors": [
+        {
+            "name": "Power Platform ToolBox",
+            "url": "https://github.com/PowerPlatformToolBox"
+        }
+    ],
+    "configurations": {
+        "repository": "https://github.com/PowerPlatformToolBox/sample-tools/tree/main/new/html-sample",
+        "website": "https://powerplatformtoolbox.com",
+        "iconUrl": "https://raw.githubusercontent.com/PowerPlatformToolBox/sample-tools/refs/heads/main/new/html-sample/icon/sample-icon.png",
+        "readmeUrl": "https://raw.githubusercontent.com/PowerPlatformToolBox/sample-tools/refs/heads/main/new/html-sample/README.md"
+    },
+    "features": {
+        "multiConnection": "optional"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/PowerPlatform-ToolBox/desktop-app.git",
+        "directory": "sample/html-sample"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+        "build": "tsc && npm run copy-html && npm run copy-css",
+        "copy-html": "shx cp src/index.html dist/",
+        "copy-css": "shx cp src/styles.css dist/",
+        "finalize-package": "npm shrinkwrap",
+        "watch": "tsc --watch"
+    },
+    "devDependencies": {
+        "@pptb/types": "^1.0.11",
+        "typescript": "^5.0.0",
+        "shx": "^0.4.0"
+    },
+    "files": [
+        "dist",
+        "icon",
+        "npm-shrinkwrap.json"
+    ]
 }
