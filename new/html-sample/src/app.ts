@@ -192,6 +192,14 @@ function setupEventHandlers() {
   document.getElementById("get-theme-btn")?.addEventListener("click", showCurrentTheme);
   document.getElementById("save-file-btn")?.addEventListener("click", saveDataToFile);
 
+  // File System API buttons
+  document.getElementById("read-text-btn")?.addEventListener("click", readText);
+  document.getElementById("read-directory-btn")?.addEventListener("click", readDirectory);
+  document.getElementById("create-directory-btn")?.addEventListener("click", createDirectory);
+  document.getElementById("read-system-file-btn")?.addEventListener("click", readSystemFile);
+  document.getElementById("read-hardcoded-file-btn")?.addEventListener("click", readHardcodedFile);
+  document.getElementById("read-direct-file-btn")?.addEventListener("click", readDirectFile);
+
   // Terminal buttons
   document.getElementById("create-terminal-btn")?.addEventListener("click", createTerminal);
   document.getElementById("execute-command-btn")?.addEventListener("click", executeTerminalCommand);
@@ -313,6 +321,325 @@ async function saveDataToFile() {
     }
   } catch (error) {
     log(`Error saving file: ${(error as Error).message}`, "error");
+  }
+}
+
+/**
+ * Read text file
+ */
+async function readText() {
+  try {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = "Selecting text file...\n";
+
+    const filePath = await toolbox.fileSystem.selectPath({
+      type: "file",
+      title: "Select a Text File",
+      filters: [
+        { name: "Text Files", extensions: ["txt", "json", "xml", "csv", "md"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
+    });
+
+    if (!filePath) {
+      if (output) output.textContent = "File selection cancelled.";
+      log("File selection cancelled", "info");
+      return;
+    }
+
+    if (output) output.textContent = `Reading file: ${filePath}\n\n`;
+
+    const content = await toolbox.fileSystem.readText(filePath);
+
+    if (output) {
+      output.textContent += `File Size: ${content.length} characters\n\n`;
+      output.textContent += "Content:\n";
+      output.textContent += "─".repeat(50) + "\n";
+      output.textContent += content;
+    }
+
+    await showNotification("Success", `File read successfully (${content.length} characters)`, "success");
+    log(`Read text file: ${filePath} (${content.length} chars)`, "success");
+  } catch (error) {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = `Error: ${(error as Error).message}`;
+    log(`Error reading text file: ${(error as Error).message}`, "error");
+  }
+}
+
+/**
+ * Read directory contents
+ */
+async function readDirectory() {
+  try {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = "Selecting directory...\n";
+
+    const dirPath = await toolbox.fileSystem.selectPath({
+      type: "folder",
+      title: "Select a Directory",
+    });
+
+    if (!dirPath) {
+      if (output) output.textContent = "Directory selection cancelled.";
+      log("Directory selection cancelled", "info");
+      return;
+    }
+
+    if (output) output.textContent = `Reading directory: ${dirPath}\n\n`;
+
+    const entries = await toolbox.fileSystem.readDirectory(dirPath);
+
+    // Separate files and directories
+    const directories = entries.filter((e) => e.type === "directory");
+    const files = entries.filter((e) => e.type === "file");
+
+    if (output) {
+      output.textContent += `Found ${entries.length} entries:\n`;
+      output.textContent += "─".repeat(50) + "\n";
+
+      if (directories.length > 0) {
+        output.textContent += `\nDirectories (${directories.length}):\n`;
+        directories.forEach((entry) => {
+          output!.textContent += `  📁 ${entry.name}\n`;
+        });
+      }
+
+      if (files.length > 0) {
+        output.textContent += `\nFiles (${files.length}):\n`;
+        files.forEach((entry) => {
+          output!.textContent += `  📄 ${entry.name}\n`;
+        });
+      }
+    }
+
+    await showNotification(
+      "Success",
+      `Directory read successfully (${entries.length} entries)`,
+      "success",
+    );
+    log(
+      `Read directory: ${dirPath} (${entries.length} entries: ${directories.length} dirs, ${files.length} files)`,
+      "success",
+    );
+  } catch (error) {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = `Error: ${(error as Error).message}`;
+    log(`Error reading directory: ${(error as Error).message}`, "error");
+  }
+}
+
+/**
+ * Create directory
+ */
+async function createDirectory() {
+  try {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = "Selecting parent directory...\n";
+
+    const parentPath = await toolbox.fileSystem.selectPath({
+      type: "folder",
+      title: "Select Parent Directory",
+    });
+
+    if (!parentPath) {
+      if (output) output.textContent = "Directory selection cancelled.";
+      log("Directory selection cancelled", "info");
+      return;
+    }
+
+    // Use built-in prompt for directory name (workaround since browser prompt may not be available)
+    // For better UX, you could add an input field to the UI
+    const dirName = prompt("Enter new directory name:", "new-folder");
+
+    if (!dirName || dirName.trim() === "") {
+      if (output) output.textContent = "Directory creation cancelled.";
+      log("Directory creation cancelled", "info");
+      return;
+    }
+
+    const newDirPath = `${parentPath}/${dirName.trim()}`;
+
+    if (output) output.textContent = `Creating directory: ${newDirPath}\n`;
+
+    await toolbox.fileSystem.createDirectory(newDirPath);
+
+    if (output) {
+      output.textContent += `✓ Directory created successfully!\n`;
+      output.textContent += `Path: ${newDirPath}`;
+    }
+
+    await showNotification("Success", `Directory created: ${newDirPath}`, "success");
+    log(`Created directory: ${newDirPath}`, "success");
+  } catch (error) {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = `Error: ${(error as Error).message}`;
+    log(`Error creating directory: ${(error as Error).message}`, "error");
+  }
+}
+
+/**
+ * Read system file (hardcoded macOS path for testing)
+ * This tests error handling when accessing restricted files
+ */
+async function readSystemFile() {
+  try {
+    const output = document.getElementById("filesystem-output");
+    const systemFilePath = "/var/log/system.log";
+
+    if (output) output.textContent = `Attempting to read system file: ${systemFilePath}\n\n`;
+
+    log(`Attempting to read system file: ${systemFilePath}`, "info");
+
+    const content = await toolbox.fileSystem.readText(systemFilePath);
+
+    if (output) {
+      output.textContent += `File Size: ${content.length} characters\n\n`;
+      output.textContent += "Content (first 1000 chars):\n";
+      output.textContent += "─".repeat(50) + "\n";
+      output.textContent += content.substring(0, 1000);
+      if (content.length > 1000) {
+        output.textContent += "\n\n... (truncated)";
+      }
+    }
+
+    await showNotification("Success", `System file read (${content.length} characters)`, "success");
+    log(`Successfully read system file: ${systemFilePath}`, "success");
+  } catch (error) {
+    const output = document.getElementById("filesystem-output");
+    const errorMsg = (error as Error).message;
+    if (output) {
+      output.textContent = `❌ Error Reading System File\n`;
+      output.textContent += `Path: /var/log/system.log\n\n`;
+      output.textContent += `Error: ${errorMsg}\n\n`;
+      output.textContent += "This is expected - system files are typically restricted due to:\n";
+      output.textContent += "- File permissions (insufficient access)\n";
+      output.textContent += "- Security restrictions\n";
+      output.textContent += "- Sandbox limitations";
+    }
+    log(`Error reading system file: ${errorMsg}`, "error");
+    await showNotification("Error Reading System File", errorMsg, "error");
+  }
+}
+
+/**
+ * Read file with selection dialog, but then hardcode a macOS path instead
+ * This tests ignoring user selection and attempting to read a restricted path
+ */
+async function readHardcodedFile() {
+  try {
+    const output = document.getElementById("filesystem-output");
+    if (output) output.textContent = "Opening file selection dialog...\n";
+
+    log("Opening file selection dialog", "info");
+
+    // Open file picker dialog
+    const selectedPath = await toolbox.fileSystem.selectPath({
+      type: "file",
+      title: "Select a File (will be ignored)",
+      filters: [{ name: "All Files", extensions: ["*"] }],
+    });
+
+    if (!selectedPath) {
+      if (output) output.textContent = "File selection cancelled.";
+      log("File selection cancelled", "info");
+      return;
+    }
+
+    // Show what was selected
+    if (output) {
+      output.textContent = `User selected: ${selectedPath}\n\n`;
+      output.textContent += "But we're ignoring that and attempting to read a hardcoded system path instead...\n\n";
+      output.textContent += "─".repeat(50) + "\n\n";
+    }
+
+    log(`User selected: ${selectedPath} (will be ignored)`, "info");
+
+    // Hardcode a macOS system path and ignore the selection
+    const hardcodedPath = "/etc/passwd";
+    if (output) output.textContent += `Attempting to read hardcoded path: ${hardcodedPath}\n\n`;
+
+    log(`Attempting to read hardcoded path: ${hardcodedPath}`, "info");
+
+    const content = await toolbox.fileSystem.readText(hardcodedPath);
+
+    if (output) {
+      output.textContent += `✓ Success! File Size: ${content.length} characters\n\n`;
+      output.textContent += "Content:\n";
+      output.textContent += "─".repeat(50) + "\n";
+      output.textContent += content.substring(0, 1500);
+      if (content.length > 1500) {
+        output.textContent += "\n\n... (truncated)";
+      }
+    }
+
+    await showNotification(
+      "File Read Successfully",
+      `Hardcoded file read: ${hardcodedPath} (${content.length} characters)`,
+      "success",
+    );
+    log(`Successfully read hardcoded file: ${hardcodedPath}`, "success");
+  } catch (error) {
+    const output = document.getElementById("filesystem-output");
+    const errorMsg = (error as Error).message;
+    if (output) {
+      output.textContent += `❌ Error Reading Hardcoded File\n`;
+      output.textContent += `Path: /etc/passwd\n\n`;
+      output.textContent += `Error: ${errorMsg}\n\n`;
+      output.textContent += "This demonstrates that hardcoded system paths are typically restricted:\n";
+      output.textContent += "- Permission denied (macOS sandbox restrictions)\n";
+      output.textContent += "- The file picker selected a different path, but we tried to read this one instead\n";
+      output.textContent += "- Real-world use case: don't hardcode paths, always use user selection";
+    }
+    log(`Error reading hardcoded file: ${errorMsg}`, "error");
+    await showNotification("Error Reading Hardcoded File", errorMsg, "error");
+  }
+}
+
+/**
+ * Read a hardcoded macOS file path directly without using selectPath dialog
+ * This tests reading a restricted file with no user interaction
+ */
+async function readDirectFile() {
+  try {
+    const output = document.getElementById("filesystem-output");
+    const hardcodedPath = "/etc/hosts";
+
+    if (output) output.textContent = `Reading hardcoded path directly (no dialog)...\n`;
+    if (output) output.textContent += `Path: ${hardcodedPath}\n\n`;
+
+    log(`Attempting direct read of hardcoded path: ${hardcodedPath}`, "info");
+
+    const content = await toolbox.fileSystem.readText(hardcodedPath);
+
+    if (output) {
+      output.textContent += `✓ Success! File Size: ${content.length} characters\n\n`;
+      output.textContent += "Content:\n";
+      output.textContent += "─".repeat(50) + "\n";
+      output.textContent += content;
+    }
+
+    await showNotification(
+      "File Read Successfully",
+      `Direct file read: ${hardcodedPath} (${content.length} characters)`,
+      "success",
+    );
+    log(`Successfully read direct file: ${hardcodedPath}`, "success");
+  } catch (error) {
+    const output = document.getElementById("filesystem-output");
+    const errorMsg = (error as Error).message;
+    if (output) {
+      output.textContent = `❌ Error Reading Hardcoded Path\n`;
+      output.textContent += `Path: /etc/hosts\n`;
+      output.textContent += `Method: Direct read (no selectPath dialog)\n\n`;
+      output.textContent += `Error: ${errorMsg}\n\n`;
+      output.textContent += "This demonstrates:\n";
+      output.textContent += "- System files are protected even with hardcoded paths\n";
+      output.textContent += "- No file picker dialog was used\n";
+      output.textContent += "- Security restrictions apply to all file access attempts";
+    }
+    log(`Error reading direct file: ${errorMsg}`, "error");
+    await showNotification("Error Reading Direct File", errorMsg, "error");
   }
 }
 
