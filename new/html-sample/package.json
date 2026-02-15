@@ -1,9 +1,10 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.1.0",
+    "version": "1.1.2",
     "displayName": "HTML Sample Tool",
     "description": "A sample Power Platform ToolBox tool built with HTML, CSS, and TypeScript",
     "main": "index.html",
+    "icon": "icon/sample-icon.svg",
     "author": "Power Platform ToolBox",
     "keywords": [
         "powerplatform",
@@ -38,9 +39,10 @@
         "node": ">=18.0.0"
     },
     "scripts": {
-        "build": "tsc && npm run copy-html && npm run copy-css",
+        "build": "tsc && npm run copy-html && npm run copy-css && npm run copy-icon",
         "copy-html": "shx cp src/index.html dist/",
         "copy-css": "shx cp src/styles.css dist/",
+        "copy-icon": "shx cp -r icon/ dist/icon/",
         "finalize-package": "npm shrinkwrap",
         "watch": "tsc --watch"
     },
@@ -51,7 +53,6 @@
     },
     "files": [
         "dist",
-        "icon",
         "npm-shrinkwrap.json"
     ]
 }
