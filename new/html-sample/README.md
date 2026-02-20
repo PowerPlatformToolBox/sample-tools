@@ -56,7 +56,10 @@ This compiles the TypeScript source in `src/` to JavaScript in `dist/`.
 ```
 html-sample/
 ├── src/
-│   └── app.ts           # Main application logic (TypeScript)
+│   ├── app.ts           # Main application logic (TypeScript)
+│   ├── features/        # UI feature modules (terminal, filesystem, etc.)
+│   ├── security/        # Security policy + test suites
+│   └── utils/           # Small reusable helpers
 ├── index.html           # Main HTML file (entry point)
 ├── styles.css           # Stylesheet
 ├── package.json         # Package configuration
@@ -94,6 +97,8 @@ html-sample/
 **Terminal:**
 - Create isolated terminal instances
 - Execute shell commands
+- Run a safe terminal security probe (non-destructive)
+- Run API-specific security test suites with pass/fail JSON reports
 - View command output
 - Close terminal when done
 
@@ -149,6 +154,42 @@ const dataverse: typeof window.dataverseAPI = window.dataverseAPI;
 2. **Add Features:** Update `src/app.ts`
 3. **Rebuild:** Run `npm run build`
 4. **Reload Tool:** In Power Platform Tool Box, close and reopen the tool
+
+## Security Testing Guidance
+
+Use the built-in **Run Security Probe** button in the Terminal section to validate terminal exposure with safe commands only.
+
+What it checks:
+- Terminal can be created and receives command output
+- Basic command execution works
+- Command chaining is possible (risk signal if unrestricted)
+
+What it does not do:
+- No destructive commands
+- No credential, SSH, or private file access attempts
+- No process memory dumping attempts
+
+If the probe succeeds, treat that as a signal to enforce stricter host-side controls in Power Platform Tool Box:
+- Command allow-listing
+- Path allow-listing for filesystem APIs
+- Auditing/logging for terminal command execution
+
+This sample now includes policy guards in [src/security/policy.ts](src/security/policy.ts):
+- `getBlockedCommandReason(...)` / `getBlockedPathReason(...)`: policy decisions
+- `executeCommandWithPolicyGuard(...)` / `readTextWithPolicyGuard(...)`: central enforcement wrappers
+
+Security suites and report formatting live in:
+- [src/security/suites.ts](src/security/suites.ts)
+- [src/security/reporting.ts](src/security/reporting.ts)
+
+It also includes **API-specific Security Suite** buttons plus an **All Suites** runner. Each suite emits a JSON report with per-test `severity` and a rolled-up `highestSeverity`:
+- **Terminal suite:** command allow-list enforcement, multiline/control-character blocking, overlong command blocking, local-data-to-network exfil pattern blocking, burst handling
+- **FileSystem suite:** absolute-path enforcement, traversal blocking, sensitive path blocking, guarded read rejection checks, API surface checks
+- **Events suite:** event API presence and malformed payload resilience checks
+- **Settings suite:** API surface checks, set/get roundtrip checks, optional setAll/getAll validation
+- **Dataverse suite:** method surface checks and read-only runtime checks (WhoAmI/query) when connected
+
+For production PPTB host hardening, apply equivalent checks in the host process (server-side / main-process boundary), not only in tool UI code.
 
 ## API Usage Examples
 

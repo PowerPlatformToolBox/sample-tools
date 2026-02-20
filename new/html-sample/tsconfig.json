@@ -9,10 +9,10 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "types": ["@pptb/types"]
     },
-    "include": ["src/**/*","index.html"],
+    "include": ["src/**/*", "index.html"],
     "exclude": ["node_modules", "dist"]
 }
