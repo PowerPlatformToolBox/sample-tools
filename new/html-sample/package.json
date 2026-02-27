@@ -1,6 +1,6 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.1.8",
+    "version": "1.1.10",
     "displayName": "HTML Sample Tool",
     "description": "A sample Power Platform ToolBox tool built with HTML, CSS, and TypeScript",
     "main": "index.html",
@@ -28,6 +28,7 @@
         "readmeUrl": "https://raw.githubusercontent.com/PowerPlatformToolBox/sample-tools/refs/heads/main/new/html-sample/README.md"
     },
     "features": {
+        "minAPI": "1.2.2",
         "multiConnection": "optional"
     },
     "repository": {
