@@ -249,6 +249,22 @@ body {
     border-color: #667eea;
 }
 
+.select-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
 .example-group {
     margin: 20px 0;
     padding: 15px;

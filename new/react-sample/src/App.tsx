@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import { ConnectionStatus } from "./components/ConnectionStatus";
 import { DataverseAPIDemo } from "./components/DataverseAPIDemo";
 import { EventLog } from "./components/EventLog";
+import { FetchXmlToolsDropdown } from "./components/FetchXmlToolsDropdown";
 import { ToolboxAPIDemo } from "./components/ToolboxAPIDemo";
 import { useConnection, useEventLog, useToolboxEvents } from "./hooks/useToolboxAPI";
 
@@ -49,6 +50,8 @@ function App() {
             <ConnectionStatus connection={connection} isLoading={isLoading} />
  
             <ToolboxAPIDemo onLog={addLog} />
+
+            <FetchXmlToolsDropdown onLog={addLog} />
 
             <DataverseAPIDemo connection={connection} onLog={addLog} />
 

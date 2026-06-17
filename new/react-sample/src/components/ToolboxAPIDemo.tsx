@@ -25,17 +25,27 @@ export const ToolboxAPIDemo: React.FC<ToolboxAPIDemoProps> = ({ onLog }) => {
   const showLoading = useCallback(async () => {
     async function startLoading() {
       try {
-        await window.toolboxAPI.utils.showLoading("Loading something for 3 seconds, please wait...");
-        onLog("Loading indicator shown for 3 seconds", "info");
+        const utilsWithLoading = window.toolboxAPI.utils as unknown as {
+          showLoading?: (message: string) => Promise<void>;
+          hideLoading?: () => Promise<void>;
+        };
 
-        setTimeout(async () => {
-          try {
-            await window.toolboxAPI.utils.hideLoading();
-            onLog("Loading indicator hidden", "success");
-          } catch (error) {
-            onLog(`Error hiding loading: ${(error as Error).message}`, "error");
-          }
-        }, 3000);
+        if (utilsWithLoading.showLoading && utilsWithLoading.hideLoading) {
+          await utilsWithLoading.showLoading("Loading something for 3 seconds, please wait...");
+          onLog("Loading indicator shown for 3 seconds", "info");
+
+          setTimeout(async () => {
+            try {
+              await utilsWithLoading.hideLoading?.();
+              onLog("Loading indicator hidden", "success");
+            } catch (error) {
+              onLog(`Error hiding loading: ${(error as Error).message}`, "error");
+            }
+          }, 3000);
+        } else {
+          await showNotification("Loading", "Loading indicator API is not available in this ToolBox version", "warning");
+          onLog("Loading indicator methods are unavailable in current API typings", "warning");
+        }
       } catch (error) {
         onLog(`Error showing loading: ${(error as Error).message}`, "error");
       }
