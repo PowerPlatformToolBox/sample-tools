@@ -18,6 +18,7 @@ import { createSecuritySuites, type SecuritySuites } from "./security/suites.js"
 // Global API references
 const toolbox = window.toolboxAPI;
 const dataverse = window.dataverseAPI;
+const powerplatform = window.powerplatformAPI;
 
 // Application state
 let currentConnection: ToolBoxAPI.DataverseConnection | null = null;
@@ -213,7 +214,6 @@ function setupEventHandlers() {
     document.getElementById("show-warning-btn")?.addEventListener("click", () => showNotification("Warning", "Please review this warning", "warning"));
 
     document.getElementById("show-error-btn")?.addEventListener("click", () => showNotification("Error", "An error has occurred", "error"));
-    document.getElementById("show-loading-btn")?.addEventListener("click", showLoading);
 
     // Utility buttons
     document.getElementById("copy-clipboard-btn")?.addEventListener("click", copyToClipboard);
@@ -258,6 +258,12 @@ function setupEventHandlers() {
     //Execute buttons
     document.getElementById("whoami-btn")?.addEventListener("click", executeWhoAmI);
 
+    // Power Platform API buttons
+    document.getElementById("list-apps-btn")?.addEventListener("click", listPowerApps);
+    document.getElementById("list-flows-btn")?.addEventListener("click", listPowerAutomateFlows);
+    document.getElementById("list-environments-btn")?.addEventListener("click", listEnvironments);
+    document.getElementById("get-governance-btn")?.addEventListener("click", getGovernanceData);
+
     // Clear log button
     document.getElementById("clear-log-btn")?.addEventListener("click", clearLog);
 
@@ -284,17 +290,6 @@ async function showNotification(title: string, body: string, type: "success" | "
         log(`Notification shown: ${title} - ${body}`, type);
     } catch (error) {
         log(`Error showing notification: ${(error as Error).message}`, "error");
-    }
-}
-
-async function showLoading() {
-    try {
-        await toolbox.utils.showLoading("Loading... for 3 seconds");
-        log("Loading shown for 3 seconds", "info");
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        await toolbox.utils.hideLoading();
-    } catch (error) {
-        log(`Error showing loading: ${(error as Error).message}`, "error");
     }
 }
 
@@ -952,7 +947,6 @@ async function demoLoading() {
     if (output) output.textContent = "Showing loading screen...\n";
 
     try {
-        await toolbox.utils.showLoading("Processing data...");
         log("Loading screen displayed", "info");
 
         // Simulate async work or perform a lightweight query
@@ -973,10 +967,121 @@ async function demoLoading() {
         log(`Loading demo error: ${(error as Error).message}`, "error");
         await showNotification("Loading Demo Error", (error as Error).message, "error");
     } finally {
-        await toolbox.utils.hideLoading();
         if (output) output.textContent += "\nLoading screen hidden.";
         log("Loading screen hidden", "info");
         await showNotification("Loading Complete", "Demo finished", "success");
+    }
+}
+
+// -----------------------------
+// Power Platform API Examples
+// -----------------------------
+
+async function listPowerApps() {
+    const output = document.getElementById("powerapps-output");
+    const envId = (document.getElementById("ppapps-env-id") as HTMLInputElement)?.value;
+
+    if (!envId) {
+        await showNotification("Missing Environment ID", "Please enter an environment ID", "warning");
+        if (output) output.textContent = "Enter an environment ID to list apps.";
+        return;
+    }
+
+    try {
+        if (output) output.textContent = "Fetching Power Apps...\n";
+        const result = await powerplatform.PowerApps.Get(`environments/${envId}/apps?api-version=2024-10-01`);
+
+        if (output) {
+            const apps = (result.value as any[]) || [];
+            output.textContent += `Found ${apps.length} app(s):\n\n`;
+            apps.forEach((app: any, index: number) => {
+                output.textContent += `${index + 1}. ${app.name}\n`;
+                output.textContent += `   ID: ${app.id || app.appId}\n`;
+                output.textContent += `   Type: ${app.type || "N/A"}\n\n`;
+            });
+            log(`Listed ${apps.length} Power Apps`, "success");
+        }
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error listing Power Apps: ${(error as Error).message}`, "error");
+    }
+}
+
+async function listPowerAutomateFlows() {
+    const output = document.getElementById("powerautomate-output");
+    const envId = (document.getElementById("ppautomate-env-id") as HTMLInputElement)?.value;
+
+    if (!envId) {
+        await showNotification("Missing Environment ID", "Please enter an environment ID", "warning");
+        if (output) output.textContent = "Enter an environment ID to list flows.";
+        return;
+    }
+
+    try {
+        if (output) output.textContent = "Fetching Power Automate flows...\n";
+        const result = await powerplatform.PowerAutomate.Get(`environments/${envId}/cloudFlows?api-version=2024-10-01`);
+
+        if (output) {
+            const flows = (result.value as any[]) || [];
+            output.textContent += `Found ${flows.length} flow(s):\n\n`;
+            flows.forEach((flow: any, index: number) => {
+                output.textContent += `${index + 1}. ${flow.displayName || flow.name}\n`;
+                output.textContent += `   ID: ${flow.id || flow.flowId}\n`;
+                output.textContent += `   State: ${flow.state || "N/A"}\n\n`;
+            });
+            log(`Listed ${flows.length} Power Automate flows`, "success");
+        }
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error listing flows: ${(error as Error).message}`, "error");
+    }
+}
+
+async function listEnvironments() {
+    const output = document.getElementById("environments-output");
+
+    try {
+        if (output) output.textContent = "Fetching environments...\n";
+        const result = await powerplatform.EnvironmentManagement.Get("environments?api-version=2024-10-01");
+
+        if (output) {
+            const envs = (result.value as any[]) || [];
+            output.textContent += `Found ${envs.length} environment(s):\n\n`;
+            envs.forEach((env: any, index: number) => {
+                output.textContent += `${index + 1}. ${env.displayName}\n`;
+                output.textContent += `   ID: ${env.id || env.environmentId}\n`;
+                output.textContent += `   Type: ${env.type || env.environmentType || "N/A"}\n\n`;
+            });
+            log(`Listed ${envs.length} environments`, "success");
+        }
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error listing environments: ${(error as Error).message}`, "error");
+    }
+}
+
+async function getGovernanceData() {
+    const output = document.getElementById("governance-output");
+    const envId = (document.getElementById("governance-env-id") as HTMLInputElement)?.value;
+
+    if (!envId) {
+        await showNotification("Missing Environment ID", "Please enter an environment ID", "warning");
+        if (output) output.textContent = "Enter an environment ID to get governance data.";
+        return;
+    }
+
+    try {
+        if (output) output.textContent = "Fetching governance data...\n";
+        const result = await powerplatform.Governance.Get(`ruleBasedPolicies/environments/${envId}/assignments?includeRuleSetCounts=true&api-version=2024-10-01`);
+
+        if (output) {
+            output.textContent += "Governance Data:\n\n";
+            output.textContent += JSON.stringify(result, null, 2);
+        }
+        log("Governance data retrieved", "success");
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error getting governance data: ${(error as Error).message}`, "error");
     }
 }
 

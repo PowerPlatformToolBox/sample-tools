@@ -68,10 +68,9 @@
 
                 <div class="example-group">
                     <h3>Advanced Utilities</h3>
-                    <p style="margin: 4px 0 8px; font-size: 12px; opacity: 0.8">Demonstrates <code>executeParallel</code>, <code>showLoading</code> & <code>hideLoading</code>.</p>
+                    <p style="margin: 4px 0 8px; font-size: 12px; opacity: 0.8">Demonstrates <code>executeParallel</code>.</p>
                     <div class="button-group">
                         <button id="parallel-demo-btn" class="btn btn-primary">Run Parallel Demo</button>
-                        <button id="loading-demo-btn" class="btn btn-secondary">Run Loading Demo</button>
                     </div>
                     <div id="parallel-output" class="output"></div>
                 </div>
@@ -170,6 +169,56 @@
                     <h3>Execute Actions</h3>
                     <button id="whoami-btn" class="btn">Execute WhoAmI</button>
                     <div id="execute-output" class="output"></div>
+                </div>
+            </section>
+
+            <!-- Power Platform API Examples -->
+            <section class="card">
+                <h2>⚡ Power Platform API Examples</h2>
+                <p style="margin: 4px 0 15px; font-size: 12px; opacity: 0.85">Generic HTTP methods for Power Platform Admin APIs (Power Apps, Power Automate, Environment Management, Governance).</p>
+
+                <div class="example-group">
+                    <h3>Power Apps API</h3>
+                    <div class="input-group">
+                        <label for="ppapps-env-id">Environment ID:</label>
+                        <input type="text" id="ppapps-env-id" placeholder="Enter environment ID" />
+                    </div>
+                    <div class="button-group">
+                        <button id="list-apps-btn" class="btn">List Admin Apps</button>
+                    </div>
+                    <div id="powerapps-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
+                    <h3>Power Automate API</h3>
+                    <div class="input-group">
+                        <label for="ppautomate-env-id">Environment ID:</label>
+                        <input type="text" id="ppautomate-env-id" placeholder="Enter environment ID" />
+                    </div>
+                    <div class="button-group">
+                        <button id="list-flows-btn" class="btn">List Flows</button>
+                    </div>
+                    <div id="powerautomate-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
+                    <h3>Environment Management API</h3>
+                    <div class="button-group">
+                        <button id="list-environments-btn" class="btn btn-primary">List Environments For User</button>
+                    </div>
+                    <div id="environments-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
+                    <h3>Governance API</h3>
+                    <div class="input-group">
+                        <label for="governance-env-id">Environment ID:</label>
+                        <input type="text" id="governance-env-id" placeholder="Enter environment ID" />
+                    </div>
+                    <div class="button-group">
+                        <button id="get-governance-btn" class="btn">List Rule Assignments By Environment Id</button>
+                    </div>
+                    <div id="governance-output" class="output"></div>
                 </div>
             </section>
 
