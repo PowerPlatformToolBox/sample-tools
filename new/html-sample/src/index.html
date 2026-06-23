@@ -222,6 +222,36 @@
                 </div>
             </section>
 
+            <!-- Inter-tool Invocation Example -->
+            <section class="card">
+                <h2>⚡ Inter-tool Invocation Example</h2>
+                <p style="margin: 4px 0 15px; font-size: 12px; opacity: 0.85">Demonstrates how to invoke other tools or read invoked values within the Power Platform ToolBox.</p>
+
+                <div class="example-group">
+                    <h3>Tool Launched by Another Tool or Agent</h3>
+                    <div class="input-group">
+                        <label for="iti-entity-name">Entity Name:</label>
+                        <input type="text" id="iti-entity-name" readonly />
+                    </div>
+                    <div class="button-group">
+                        <button id="iti-return-value-btn" class="btn">Return Default FetchXml (shown below)</button>
+                    </div>
+                    <div id="iti-default-fetch-output" class="output"></div>
+                </div>
+                <div class="example-group">
+                    <h3>Launch Fetch XML Studio</h3>
+                    <div class="input-group">
+                        <label for="iti-entity-logical-name">Entity Logical Name:</label>
+                        <input type="text" id="iti-entity-logical-name" placeholder="account" />
+                    </div>
+                    <div class="button-group">
+                        <button id="iti-launch-fetchxml-btn" class="btn">Launch Fetch XML Studio</button>
+                    </div>
+                    <h4>Returned FetchXML:</h4>
+                    <div id="iti-returned-fetch-output" class="output"></div>
+                </div>
+            </section>
+
             <!-- Event Log -->
             <section class="card">
                 <h2>📋 Event Log</h2>

@@ -25,10 +25,12 @@ let currentConnection: ToolBoxAPI.DataverseConnection | null = null;
 let secondaryConnection: ToolBoxAPI.DataverseConnection | null = null;
 let currentTerminal: ToolBoxAPI.Terminal | null = null;
 let createdId: string | null = null;
+let currentLaunchContext: Record<string, unknown> | null = null;
 
 let securitySuites: SecuritySuites | null = null;
 let terminalFeature: ReturnType<typeof createTerminalFeature> | null = null;
 let fileSystemFeature: ReturnType<typeof createFileSystemFeature> | null = null;
+let inputEntityName: string | null = null;
 
 /**
  * Initialize the application
@@ -73,6 +75,8 @@ async function initialize() {
             log,
         });
 
+        await identifyLaunchContext();
+
         // Setup UI event handlers
         setupEventHandlers();
 
@@ -85,6 +89,45 @@ async function initialize() {
         log("Tool initialized successfully", "success");
     } catch (error) {
         log(`Initialization error: ${(error as Error).message}`, "error");
+    }
+}
+
+/**
+ * Identifying Launch Context
+ */
+async function identifyLaunchContext() {
+    try {
+        const ctx = await toolbox.invocation.getLaunchContext();
+        log(`Launch context: ${ctx}`, "info");
+
+        if (ctx !== null) {
+            // Tool was launched via inter-tool invocation
+            inputEntityName = ctx.entityName as string;
+            currentLaunchContext = ctx;
+
+            log(`Launched with context for entity: ${inputEntityName}`, "success");
+
+            // Set iti-entity-name value with the entity name from the launch context
+            const entityNameInput = document.getElementById("iti-entity-name") as HTMLInputElement;
+            if (entityNameInput) {
+                entityNameInput.value = inputEntityName;
+            }
+
+            // Set default fetchXML to query the launched entity
+            const defaultFetchOutput = document.getElementById("iti-default-fetch-output");
+            if (defaultFetchOutput) {
+                defaultFetchOutput.textContent = `
+                    <fetch top="10">
+                        <entity name="${inputEntityName}">
+                            <attribute name="name" />
+                            <attribute name="${inputEntityName}id" />
+                            <order attribute="name" />
+                        </entity>
+                    </fetch>`;
+            }
+        }
+    } catch (error) {
+        log(`Error getting launch context: ${(error as Error).message}`, "error");
     }
 }
 
@@ -274,6 +317,25 @@ function setupEventHandlers() {
     // Settings buttons
     document.getElementById("load-setting-btn")?.addEventListener("click", loadToolSetting);
     document.getElementById("save-setting-btn")?.addEventListener("click", saveToolSetting);
+
+    // Inter-tool invocation buttons
+    document.getElementById("iti-return-value-btn")?.addEventListener("click", async () => {
+        const fetchXML = document.getElementById("iti-default-fetch-output")?.textContent;
+        await toolbox.invocation.returnData({
+            fetchXml: fetchXML,
+        });
+        log(`Returned data to caller: ${fetchXML}`, "info");
+        // PPTB automatically closes this window after delivering the result.
+    });
+    document.getElementById("iti-launch-fetchxml-btn")?.addEventListener("click", async () => {
+        const entityName = (document.getElementById("iti-entity-logical-name") as HTMLInputElement).value;
+        const result = await toolbox.invocation.launchTool(
+            "@mohsinonxrm/pptb-fetchxml-studio", // npm package name of the target tool
+            { entityName: entityName }, // prefill data (should match callee's prefill schema)
+        );
+
+        log(`Launched entity picker with result: ${JSON.stringify(result)}`, "info");
+    });
 }
 
 /**

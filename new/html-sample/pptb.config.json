@@ -1,0 +1,23 @@
+{
+    "invocation": {
+        "version": "1.0.0",
+        "agentInvokable": true,
+        "capabilities": [
+            "fetchxml"
+        ],
+        "prefill": {
+            "properties": {
+                "entityName": {
+                    "type": "string"
+                }
+            }
+        },
+        "returnTopic": {
+            "properties": {
+                "fetchXml": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
