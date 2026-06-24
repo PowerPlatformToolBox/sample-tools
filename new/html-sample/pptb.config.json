@@ -26,6 +26,13 @@
             "two-way"
         ],
         "defaultMode": "two-way",
-        "timeoutMS": 60000
+        "timeoutMS": 60000,
+        "headless": true,
+        "executionModes": [
+            "windowed",
+            "headless"
+        ],
+        "defaultExecutionMode": "headless",
+        "headlessEntry": "dist/headless.js"
     }
 }
