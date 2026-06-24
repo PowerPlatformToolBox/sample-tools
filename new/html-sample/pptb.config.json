@@ -1,7 +1,6 @@
 {
     "invocation": {
         "version": "1.0.0",
-        "agentInvokable": true,
         "capabilities": [
             "fetchxml"
         ],
@@ -19,5 +18,14 @@
                 }
             }
         }
+    },
+    "agents": {
+        "version": "1.0.0",
+        "invokable": true,
+        "modes": [
+            "two-way"
+        ],
+        "defaultMode": "two-way",
+        "timeoutMS": 60000
     }
 }

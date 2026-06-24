@@ -306,6 +306,9 @@ function setupEventHandlers() {
     document.getElementById("list-flows-btn")?.addEventListener("click", listPowerAutomateFlows);
     document.getElementById("list-environments-btn")?.addEventListener("click", listEnvironments);
     document.getElementById("get-governance-btn")?.addEventListener("click", getGovernanceData);
+    document.getElementById("query-role-definitions-btn")?.addEventListener("click", queryRoleDefinitions);
+    document.getElementById("assign-role-btn")?.addEventListener("click", assignRole);
+    document.getElementById("query-role-assignments-btn")?.addEventListener("click", queryRoleAssignments);
 
     // Clear log button
     document.getElementById("clear-log-btn")?.addEventListener("click", clearLog);
@@ -1144,6 +1147,148 @@ async function getGovernanceData() {
     } catch (error) {
         if (output) output.textContent = `Error: ${(error as Error).message}`;
         log(`Error getting governance data: ${(error as Error).message}`, "error");
+    }
+}
+
+/**
+ * Query role definitions from Power Platform Authorization API
+ * Retrieves all available role definitions with their IDs and names
+ */
+async function queryRoleDefinitions() {
+    const output = document.getElementById("role-definitions-output");
+
+    try {
+        if (output) output.textContent = "Fetching role definitions...\n";
+
+        // Call the Power Platform Authorization API to get role definitions
+        const result = await powerplatform.Authorization.Get("roleDefinitions?api-version=2024-10-01");
+
+        if (output) {
+            const roleDefinitions = (result.value as any[]) || [];
+            output.textContent = `Found ${roleDefinitions.length} role definition(s):\n\n`;
+
+            if (roleDefinitions.length === 0) {
+                output.textContent += "No role definitions found.";
+            } else {
+                // Display role definitions in a formatted table
+                roleDefinitions.forEach((role: any, index: number) => {
+                    output.textContent += `${index + 1}. ${role.roleDefinitionName}\n`;
+                    output.textContent += `   ID: ${role.roleDefinitionId}\n`;
+                    if (role.description) output.textContent += `   Description: ${role.description}\n`;
+                    output.textContent += "\n";
+                });
+            }
+
+            log(`Retrieved ${roleDefinitions.length} role definitions`, "success");
+            await showNotification("Role Definitions Retrieved", `Found ${roleDefinitions.length} role definition(s)`, "success");
+        }
+    } catch (error) {
+        const errorMessage = (error as Error).message;
+        if (output) output.textContent = `Error: ${errorMessage}`;
+        log(`Error querying role definitions: ${errorMessage}`, "error");
+        await showNotification("Error", `Failed to retrieve role definitions: ${errorMessage}`, "error");
+    }
+}
+
+/**
+ * Assign a role to a principal (user, service principal, or enterprise app)
+ * Creates a role assignment in the Power Platform Authorization API
+ */
+async function assignRole() {
+    const output = document.getElementById("role-assignment-output");
+    const tenantId = (document.getElementById("role-assign-tenant-id") as HTMLInputElement)?.value;
+    const principalObjectId = (document.getElementById("role-assign-principal-object-id") as HTMLInputElement)?.value;
+    const principalType = (document.getElementById("role-assign-principal-type") as HTMLSelectElement)?.value || "ApplicationUser";
+    const roleDefinitionId = (document.getElementById("role-assign-role-definition-id") as HTMLInputElement)?.value;
+
+    if (!tenantId || !principalObjectId || !roleDefinitionId) {
+        await showNotification("Missing Fields", "Please fill in all required fields", "warning");
+        if (output) output.textContent = "Please provide Tenant ID, Principal Object ID, and Role Definition ID.";
+        return;
+    }
+
+    try {
+        if (output) output.textContent = "Assigning role...\n";
+
+        // Build the request body
+        const body = {
+            roleDefinitionId,
+            principalObjectId,
+            principalType,
+            scope: `/tenants/${tenantId}`,
+        };
+
+        // Call the Power Platform Authorization API to assign role
+        const result = await powerplatform.Authorization.Post("roleAssignments?api-version=2024-10-01", body);
+
+        if (output) {
+            output.textContent = "Role assignment created successfully!\n\n";
+            output.textContent += "Assignment Details:\n";
+            output.textContent += `ID: ${(result as any).id || (result as any).roleAssignmentId}\n`;
+            output.textContent += `Role Definition ID: ${(result as any).roleDefinitionId}\n`;
+            output.textContent += `Principal Object ID: ${(result as any).principalObjectId}\n`;
+            output.textContent += `Principal Type: ${(result as any).principalType}\n`;
+            output.textContent += `Scope: ${(result as any).scope}\n`;
+        }
+
+        log(`Role assigned successfully to ${principalObjectId}`, "success");
+        await showNotification("Role Assigned", `Role assigned to ${principalObjectId}`, "success");
+    } catch (error) {
+        const errorMessage = (error as Error).message;
+        if (output) output.textContent = `Error: ${errorMessage}`;
+        log(`Error assigning role: ${errorMessage}`, "error");
+        await showNotification("Error", `Failed to assign role: ${errorMessage}`, "error");
+    }
+}
+
+/**
+ * Query existing role assignments from Power Platform Authorization API
+ * Optionally filter by principal object ID
+ */
+async function queryRoleAssignments() {
+    const output = document.getElementById("role-assignments-list-output");
+    const filterPrincipalId = (document.getElementById("query-role-assign-principal-id") as HTMLInputElement)?.value;
+
+    try {
+        if (output) output.textContent = "Fetching role assignments...\n";
+
+        // Call the Power Platform Authorization API to get role assignments
+        const result = await powerplatform.Authorization.Get("roleAssignments?api-version=2024-10-01");
+
+        if (output) {
+            const roleAssignments = (result.value as any[]) || [];
+
+            // Filter by principal object ID if provided
+            let filteredAssignments = roleAssignments;
+            if (filterPrincipalId && filterPrincipalId.trim()) {
+                filteredAssignments = roleAssignments.filter((assignment: any) => assignment.principalObjectId === filterPrincipalId);
+                output.textContent = `Found ${filteredAssignments.length} role assignment(s) for principal ${filterPrincipalId}:\n\n`;
+            } else {
+                output.textContent = `Found ${roleAssignments.length} total role assignment(s):\n\n`;
+            }
+
+            if (filteredAssignments.length === 0) {
+                output.textContent += "No role assignments found.";
+            } else {
+                // Display role assignments in a formatted table
+                filteredAssignments.forEach((assignment: any, index: number) => {
+                    output.textContent += `${index + 1}. Role Assignment ID: ${assignment.roleAssignmentId || assignment.id}\n`;
+                    output.textContent += `   Role Definition ID: ${assignment.roleDefinitionId}\n`;
+                    output.textContent += `   Principal Object ID: ${assignment.principalObjectId}\n`;
+                    output.textContent += `   Principal Type: ${assignment.principalType}\n`;
+                    output.textContent += `   Scope: ${assignment.scope}\n`;
+                    output.textContent += "\n";
+                });
+            }
+
+            log(`Retrieved ${filteredAssignments.length} role assignment(s)${filterPrincipalId ? ` for ${filterPrincipalId}` : ""}`, "success");
+            await showNotification("Role Assignments Retrieved", `Found ${filteredAssignments.length} role assignment(s)`, "success");
+        }
+    } catch (error) {
+        const errorMessage = (error as Error).message;
+        if (output) output.textContent = `Error: ${errorMessage}`;
+        log(`Error querying role assignments: ${errorMessage}`, "error");
+        await showNotification("Error", `Failed to retrieve role assignments: ${errorMessage}`, "error");
     }
 }
 

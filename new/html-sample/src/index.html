@@ -220,6 +220,54 @@
                     </div>
                     <div id="governance-output" class="output"></div>
                 </div>
+
+                <div class="example-group">
+                    <h3>Authorization API</h3>
+                    <div class="button-group">
+                        <button id="query-role-definitions-btn" class="btn btn-primary">Query Role Definitions</button>
+                    </div>
+                    <div id="role-definitions-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
+                    <h3>Authorization API - Role Assignment</h3>
+                    <div class="input-group">
+                        <label for="role-assign-tenant-id">Tenant ID:</label>
+                        <input type="text" id="role-assign-tenant-id" placeholder="e.g., 15263562-2ed2-4856-8562-42edf998128b" />
+                    </div>
+                    <div class="input-group">
+                        <label for="role-assign-principal-object-id">Principal Object ID:</label>
+                        <input type="text" id="role-assign-principal-object-id" placeholder="e.g., 78541268-7456-7856-a7ba-04424f177c7c" />
+                    </div>
+                    <div class="input-group">
+                        <label for="role-assign-principal-type">Principal Type:</label>
+                        <select id="role-assign-principal-type">
+                            <option value="ApplicationUser">ApplicationUser</option>
+                            <option value="ServicePrincipal">ServicePrincipal</option>
+                            <option value="User">User</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="role-assign-role-definition-id">Role Definition ID:</label>
+                        <input type="text" id="role-assign-role-definition-id" placeholder="e.g., ff954d61-a89a-4fbe-ace9-01c367b89f87" />
+                    </div>
+                    <div class="button-group">
+                        <button id="assign-role-btn" class="btn btn-success">Assign Role</button>
+                    </div>
+                    <div id="role-assignment-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
+                    <h3>Authorization API - Query Role Assignments</h3>
+                    <div class="input-group">
+                        <label for="query-role-assign-principal-id">Principal Object ID (Optional - filters results):</label>
+                        <input type="text" id="query-role-assign-principal-id" placeholder="e.g., 78541268-7456-7856-a7ba-04424f177c7c" />
+                    </div>
+                    <div class="button-group">
+                        <button id="query-role-assignments-btn" class="btn">Query Role Assignments</button>
+                    </div>
+                    <div id="role-assignments-list-output" class="output"></div>
+                </div>
             </section>
 
             <!-- Inter-tool Invocation Example -->
