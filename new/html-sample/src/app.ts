@@ -32,6 +32,26 @@ let terminalFeature: ReturnType<typeof createTerminalFeature> | null = null;
 let fileSystemFeature: ReturnType<typeof createFileSystemFeature> | null = null;
 let inputEntityName: string | null = null;
 
+type PowerPlatformMethodName = "Get" | "Post" | "Put" | "Patch" | "Delete";
+
+const powerPlatformNamespaces = [
+    "Analytics",
+    "AppManagement",
+    "Authorization",
+    "Connectivity",
+    "CopilotStudio",
+    "Dynamics",
+    "EnvironmentManagement",
+    "Governance",
+    "Licensing",
+    "PowerApps",
+    "PowerAutomate",
+    "PowerPages",
+    "ResourceQuery",
+    "UserManagement",
+    "WorkflowAgents",
+] as const;
+
 /**
  * Initialize the application
  */
@@ -309,6 +329,7 @@ function setupEventHandlers() {
     document.getElementById("query-role-definitions-btn")?.addEventListener("click", queryRoleDefinitions);
     document.getElementById("assign-role-btn")?.addEventListener("click", assignRole);
     document.getElementById("query-role-assignments-btn")?.addEventListener("click", queryRoleAssignments);
+    document.getElementById("pp-generic-execute-btn")?.addEventListener("click", executeGenericPowerPlatformEndpoint);
 
     // Clear log button
     document.getElementById("clear-log-btn")?.addEventListener("click", clearLog);
@@ -1289,6 +1310,73 @@ async function queryRoleAssignments() {
         if (output) output.textContent = `Error: ${errorMessage}`;
         log(`Error querying role assignments: ${errorMessage}`, "error");
         await showNotification("Error", `Failed to retrieve role assignments: ${errorMessage}`, "error");
+    }
+}
+
+async function executeGenericPowerPlatformEndpoint() {
+    const output = document.getElementById("pp-generic-output");
+    const method = (document.getElementById("pp-generic-method") as HTMLSelectElement | null)?.value as PowerPlatformMethodName;
+    const namespace = (document.getElementById("pp-generic-namespace") as HTMLSelectElement | null)?.value;
+    const path = (document.getElementById("pp-generic-path") as HTMLInputElement | null)?.value?.trim();
+    const rawBody = (document.getElementById("pp-generic-body") as HTMLTextAreaElement | null)?.value?.trim();
+
+    if (!method || !namespace || !path) {
+        await showNotification("Missing Inputs", "Method, namespace, and path are required", "warning");
+        if (output) output.textContent = "Please provide method, namespace, and path.";
+        return;
+    }
+
+    if (!powerPlatformNamespaces.includes(namespace as (typeof powerPlatformNamespaces)[number])) {
+        await showNotification("Invalid Namespace", `Unsupported namespace: ${namespace}`, "error");
+        if (output) output.textContent = `Unsupported namespace: ${namespace}`;
+        return;
+    }
+
+    let parsedBody: unknown = undefined;
+    if (rawBody) {
+        try {
+            parsedBody = JSON.parse(rawBody);
+        } catch {
+            await showNotification("Invalid JSON Body", "Request body must be valid JSON", "error");
+            if (output) output.textContent = "Request body is not valid JSON.";
+            return;
+        }
+    }
+
+    try {
+        if (output) {
+            output.textContent = `Executing ${method.toUpperCase()} ${namespace}/${path}\n\n`;
+        }
+
+        const namespaceClient = (powerplatform as unknown as Record<string, Record<PowerPlatformMethodName, (...args: unknown[]) => Promise<unknown>>>)[namespace];
+        if (!namespaceClient) {
+            throw new Error(`Namespace '${namespace}' not found on powerplatformAPI`);
+        }
+
+        const methodClient = namespaceClient[method];
+        if (typeof methodClient !== "function") {
+            throw new Error(`Method '${method}' is not available on namespace '${namespace}'`);
+        }
+
+        let result: unknown;
+        if (method === "Get") {
+            result = await methodClient(path);
+        } else if (method === "Delete") {
+            result = parsedBody === undefined ? await methodClient(path) : await methodClient(path, undefined, undefined, parsedBody);
+        } else {
+            result = await methodClient(path, parsedBody ?? {});
+        }
+
+        if (output) {
+            output.textContent += JSON.stringify(result, null, 2);
+        }
+
+        log(`Executed ${method} on ${namespace}: ${path}`, "success");
+    } catch (error) {
+        const message = (error as Error).message;
+        if (output) output.textContent = `Error executing endpoint: ${message}`;
+        log(`Generic Power Platform endpoint error: ${message}`, "error");
+        await showNotification("Endpoint Execution Failed", message, "error");
     }
 }
 

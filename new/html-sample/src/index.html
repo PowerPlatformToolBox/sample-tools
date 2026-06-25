@@ -178,6 +178,60 @@
                 <p style="margin: 4px 0 15px; font-size: 12px; opacity: 0.85">Generic HTTP methods for Power Platform Admin APIs (Power Apps, Power Automate, Environment Management, Governance).</p>
 
                 <div class="example-group">
+                    <h3>Generic Endpoint Tester</h3>
+                    <p style="margin: 4px 0 10px; font-size: 12px; opacity: 0.85">
+                        Select method + namespace from the namespace catalog and provide a relative path (for example:
+                        <code>environments?api-version=2024-10-01</code>).
+                    </p>
+                    <div class="input-group">
+                        <label for="pp-generic-method">Method:</label>
+                        <select id="pp-generic-method">
+                            <option value="Get" selected>GET</option>
+                            <option value="Post">POST</option>
+                            <option value="Put">PUT</option>
+                            <option value="Patch">PATCH</option>
+                            <option value="Delete">DELETE</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="pp-generic-namespace">Namespace:</label>
+                        <select id="pp-generic-namespace">
+                            <option value="Analytics">Analytics</option>
+                            <option value="AppManagement">AppManagement</option>
+                            <option value="Authorization">Authorization</option>
+                            <option value="Connectivity">Connectivity</option>
+                            <option value="CopilotStudio">CopilotStudio</option>
+                            <option value="Dynamics">Dynamics</option>
+                            <option value="EnvironmentManagement" selected>EnvironmentManagement</option>
+                            <option value="Governance">Governance</option>
+                            <option value="Licensing">Licensing</option>
+                            <option value="PowerApps">PowerApps</option>
+                            <option value="PowerAutomate">PowerAutomate</option>
+                            <option value="PowerPages">PowerPages</option>
+                            <option value="ResourceQuery">ResourceQuery</option>
+                            <option value="UserManagement">UserManagement</option>
+                            <option value="WorkflowAgents">WorkflowAgents</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="pp-generic-path">Relative Path:</label>
+                        <input type="text" id="pp-generic-path" value="environments?api-version=2024-10-01" placeholder="e.g., environments/{environmentId}/apps?api-version=2024-10-01" />
+                    </div>
+                    <div class="input-group">
+                        <label for="pp-generic-body">Request Body (JSON, optional for POST/PUT/PATCH/DELETE):</label>
+                        <textarea
+                            id="pp-generic-body"
+                            style="width: 100%; min-height: 110px; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4"
+                            placeholder="{\n  \"sample\": \"value\"\n}"
+                        ></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button id="pp-generic-execute-btn" class="btn btn-primary">Execute Endpoint</button>
+                    </div>
+                    <div id="pp-generic-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
                     <h3>Power Apps API</h3>
                     <div class="input-group">
                         <label for="ppapps-env-id">Environment ID:</label>
