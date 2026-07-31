@@ -29,8 +29,6 @@ type HeadlessContext = {
     toolName: string;
     /** Invocation mode, e.g. "two-way". */
     invocationMode: string;
-    /** Bearer token for authenticating against Dataverse. Not logged. */
-    authToken?: string;
     /** Report progress back to the caller (0-100). */
     updateProgress: (percent: number, message: string) => void;
     /** Structured logger provided by the runtime. */
@@ -39,7 +37,10 @@ type HeadlessContext = {
 
 /** Return value (matches invocation.returnTopic schema). */
 type HeadlessResult = {
+    entityName: string;
     fetchXml: string;
+    recordCount: number;
+    records: Record<string, unknown>[];
 };
 
 type CommonJsModule = {
@@ -50,6 +51,42 @@ type CommonJsModule = {
 
 declare const module: CommonJsModule;
 
+declare const dataverseAPI: DataverseAPI.API;
+
+function sanitizeEntityName(value: string): string {
+    const trimmed = value.trim();
+
+    if (!/^[A-Za-z0-9_]+$/.test(trimmed)) {
+        throw new Error("Invalid entity name. Only letters, numbers, and underscores are allowed.");
+    }
+
+    return trimmed.toLowerCase();
+}
+
+async function resolveEntityAttributes(api: DataverseAPI.API, entityName: string): Promise<{ idAttribute: string; nameAttribute?: string }> {
+    try {
+        const metadata = await api.getEntityMetadata(entityName, true, ["PrimaryIdAttribute", "PrimaryNameAttribute"]);
+        const idAttribute = typeof metadata.PrimaryIdAttribute === "string" && metadata.PrimaryIdAttribute.trim().length > 0 ? metadata.PrimaryIdAttribute : `${entityName}id`;
+        const nameAttribute = typeof metadata.PrimaryNameAttribute === "string" && metadata.PrimaryNameAttribute.trim().length > 0 ? metadata.PrimaryNameAttribute : undefined;
+
+        return { idAttribute, nameAttribute };
+    } catch {
+        // Fallback keeps headless invocation resilient when metadata lookup is unavailable.
+        return {
+            idAttribute: `${entityName}id`,
+            nameAttribute: "name",
+        };
+    }
+}
+
+function buildFetchXml(entityName: string, idAttribute: string, nameAttribute?: string): string {
+    const attributeLines = [`    <attribute name="${idAttribute}" />`, ...(nameAttribute ? [`    <attribute name="${nameAttribute}" />`] : [])];
+
+    const orderLine = nameAttribute ? `\n    <order attribute="${nameAttribute}" />` : "";
+
+    return `<fetch top="10">\n  <entity name="${entityName}">\n${attributeLines.join("\n")}${orderLine}\n  </entity>\n</fetch>`;
+}
+
 /**
  * Headless invocation handler.
  *
@@ -57,34 +94,39 @@ declare const module: CommonJsModule;
  * so MCP agents can consume it without opening the tool UI.
  */
 async function invokeHeadless(input: HeadlessInput, context: HeadlessContext): Promise<HeadlessResult> {
-    const { toolId, toolName, invocationMode, authToken, updateProgress, logger } = context;
+    const { toolId, toolName, invocationMode, updateProgress, logger } = context;
 
     logger.info(`Starting headless run for ${toolName} (${toolId}) in mode ${invocationMode}`);
 
     updateProgress(10, "validating input");
 
-    const entityName = typeof input.entityName === "string" && input.entityName.trim() !== "" ? input.entityName.trim() : "account";
-
-    if (authToken) {
-        updateProgress(40, "auth token received");
-    } else {
-        updateProgress(40, "running without auth token");
+    if (typeof dataverseAPI === "undefined" || dataverseAPI === null) {
+        throw new Error("dataverseAPI is not available in this runtime context");
     }
 
-    updateProgress(80, "building FetchXML");
+    const entityName = sanitizeEntityName(typeof input.entityName === "string" && input.entityName.trim() !== "" ? input.entityName : "account");
 
-    const fetchXml = `<fetch top="10">
-  <entity name="${entityName}">
-    <attribute name="name" />
-    <attribute name="${entityName}id" />
-    <order attribute="name" />
-  </entity>
-</fetch>`;
+    updateProgress(40, "resolving entity metadata");
+
+    const attributes = await resolveEntityAttributes(dataverseAPI, entityName);
+
+    updateProgress(75, "building FetchXML");
+
+    const fetchXml = buildFetchXml(entityName, attributes.idAttribute, attributes.nameAttribute);
+
+    updateProgress(90, "executing FetchXML query");
+
+    const result = await dataverseAPI.fetchXmlQuery(fetchXml);
 
     updateProgress(100, "done");
-    logger.info(`Headless run complete for entity: ${entityName}`);
+    logger.info(`Headless run complete for entity: ${entityName}. Returned ${result.value.length} record(s).`);
 
-    return { fetchXml };
+    return {
+        entityName,
+        fetchXml,
+        recordCount: result.value.length,
+        records: result.value,
+    };
 }
 
 module.exports = {

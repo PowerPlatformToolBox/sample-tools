@@ -13,8 +13,17 @@
         },
         "returnTopic": {
             "properties": {
+                "entityName": {
+                    "type": "string"
+                },
                 "fetchXml": {
                     "type": "string"
+                },
+                "recordCount": {
+                    "type": "number"
+                },
+                "records": {
+                    "type": "array"
                 }
             }
         }

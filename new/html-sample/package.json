@@ -1,6 +1,6 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.2.8",
+    "version": "1.4.0",
     "displayName": "HTML Sample Tool",
     "description": "A sample Power Platform ToolBox tool built with HTML, CSS, and TypeScript",
     "main": "index.html",
@@ -30,6 +30,36 @@
         "minAPI": "1.2.2",
         "multiConnection": "optional",
         "enabledForPowerPlatformAPI": true
+    },
+    "cspExceptions": {
+        "style-src": [
+            {
+                "domain": "fonts.googleapis.com",
+                "exceptionReason": "Provides font"
+            }
+        ],
+        "script-src": [
+            {
+                "domain": "api.example.com",
+                "optional": true,
+                "exceptionReason": "Reads **environment** configuration via `OData`"
+            }
+        ],
+        "connect-src": [
+            {
+                "domain": "api.example.com",
+                "exceptionReason": "Connects **environment** configuration via `OData`"
+            },
+            {
+                "domain": "cdn.example.com",
+                "optional": true,
+                "exceptionReason": "Loads UI assets"
+            },
+            {
+                "domain": "new.test.com",
+                "exceptionReason": "Tests new required CSP consent"
+            }
+        ]
     },
     "repository": {
         "type": "git",
