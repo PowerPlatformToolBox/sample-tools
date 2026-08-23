@@ -1,6 +1,6 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "displayName": "HTML Sample Tool",
     "description": "A sample Power Platform ToolBox tool built with HTML, CSS, and TypeScript",
     "main": "index.html",
@@ -56,7 +56,7 @@
                 "exceptionReason": "Loads UI assets"
             },
             {
-                "domain": "new.test.com",
+                "domain": "brand-new.test.com",
                 "exceptionReason": "Tests new required CSP consent"
             }
         ]
