@@ -8,6 +8,9 @@
             "properties": {
                 "entityName": {
                     "type": "string"
+                },
+                "fetchXml": {
+                    "type": "string"
                 }
             }
         },

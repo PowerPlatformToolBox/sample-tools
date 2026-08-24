@@ -331,17 +331,26 @@
 
                 <div class="example-group">
                     <h3>Tool Launched by Another Tool or Agent</h3>
+                    <p>
+                        To test this, open another tool that uses <i>FindToolsByCapabilities</i> 
+                        and launch this tool with the <code>entityName</code> and/or <code>fetchXml</code> prefill values. 
+                        The values will be displayed below.
+                    </p>
                     <div class="input-group">
                         <label for="iti-entity-name">Entity Name:</label>
-                        <input type="text" id="iti-entity-name" readonly />
+                        <div id="iti-entity-name" class="output"></div>
                     </div>
-                    <div class="button-group">
-                        <button id="iti-return-value-btn" class="btn">Return Default FetchXml (shown below)</button>
+                    <div class="input-group">
+                        <label for="iti-fetch-output">FetchXML Output:</label>
+                        <div id="iti-default-fetch-output" class="output"></div>
                     </div>
-                    <div id="iti-default-fetch-output" class="output"></div>
                 </div>
                 <div class="example-group">
                     <h3>Launch Fetch XML Studio</h3>
+                    <p>
+                        Enter an entity logical name and click the button below to launch the <code>Fetch XML Studio</code> 
+                        tool with the entity prefilled. The returned FetchXML will be displayed below.
+                    </p>
                     <div class="input-group">
                         <label for="iti-entity-logical-name">Entity Logical Name:</label>
                         <input type="text" id="iti-entity-logical-name" placeholder="account" />
@@ -351,6 +360,30 @@
                     </div>
                     <h4>Returned FetchXML:</h4>
                     <div id="iti-returned-fetch-output" class="output"></div>
+                </div>
+                <div class="example-group">
+                    <h3>Test any Inter-Invocation Tool</h3>
+                    <p>
+                        Enter the package name of any tool that supports inter-tool invocation and click the button below to launch it.
+                        The returned data will be displayed below.
+                    </p>
+                    <div class="input-group">
+                        <label for="iti-tool-package-name">Tool Package Name:</label>
+                        <input type="text" id="iti-tool-package-name" placeholder="@mohsinonxrm/pptb-fetchxml-studio" />
+                    </div>
+                    <div class="input-group">
+                        <label for="iti-tool-prefill-data">Prefill Data (JSON):</label>
+                        <textarea
+                            id="iti-tool-prefill-data"
+                            style="width: 100%; min-height: 110px; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4"
+                            placeholder="{\n  \"entityLogicalName\": \"account\"\n}"
+                        ></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button id="iti-launch-iti-tool-btn" class="btn">Launch Tool</button>
+                    </div>
+                    <h4>Returned Data:</h4>
+                    <div id="iti-returned-iti-tool-output" class="output"></div>
                 </div>
             </section>
 

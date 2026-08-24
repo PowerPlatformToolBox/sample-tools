@@ -31,6 +31,7 @@ let securitySuites: SecuritySuites | null = null;
 let terminalFeature: ReturnType<typeof createTerminalFeature> | null = null;
 let fileSystemFeature: ReturnType<typeof createFileSystemFeature> | null = null;
 let inputEntityName: string | null = null;
+let fetchXmlFromLaunchContext: string | null = null;
 
 type PowerPlatformMethodName = "Get" | "Post" | "Put" | "Patch" | "Delete";
 
@@ -122,7 +123,8 @@ async function identifyLaunchContext() {
 
         if (ctx !== null) {
             // Tool was launched via inter-tool invocation
-            inputEntityName = ctx.entityName as string;
+            inputEntityName = (ctx.entityName as string) ?? null;
+            fetchXmlFromLaunchContext = (ctx.fetchXml as string) ?? null;
             currentLaunchContext = ctx;
 
             log(`Launched with context for entity: ${inputEntityName}`, "success");
@@ -136,12 +138,12 @@ async function identifyLaunchContext() {
             // Set default fetchXML to query the launched entity
             const defaultFetchOutput = document.getElementById("iti-default-fetch-output");
             if (defaultFetchOutput) {
-                defaultFetchOutput.textContent = `
-                    <fetch top="10">
+                defaultFetchOutput.textContent =
+                    fetchXmlFromLaunchContext ||
+                    `<fetch top="10">
                         <entity name="${inputEntityName}">
                             <attribute name="name" />
                             <attribute name="${inputEntityName}id" />
-                            <order attribute="name" />
                         </entity>
                     </fetch>`;
             }
@@ -343,22 +345,24 @@ function setupEventHandlers() {
     document.getElementById("save-setting-btn")?.addEventListener("click", saveToolSetting);
 
     // Inter-tool invocation buttons
-    document.getElementById("iti-return-value-btn")?.addEventListener("click", async () => {
-        const fetchXML = document.getElementById("iti-default-fetch-output")?.textContent;
-        await toolbox.invocation.returnData({
-            fetchXml: fetchXML,
-        });
-        log(`Returned data to caller: ${fetchXML}`, "info");
-        // PPTB automatically closes this window after delivering the result.
-    });
     document.getElementById("iti-launch-fetchxml-btn")?.addEventListener("click", async () => {
         const entityName = (document.getElementById("iti-entity-logical-name") as HTMLInputElement).value;
         const result = await toolbox.invocation.launchTool(
             "@mohsinonxrm/pptb-fetchxml-studio", // npm package name of the target tool
-            { entityName: entityName }, // prefill data (should match callee's prefill schema)
+            { entityLogicalName: entityName }, // prefill data (should match callee's prefill schema)
         );
+        const fetchXml = (result as { fetchXml?: string })?.fetchXml ?? "No FetchXML returned";
+        document.getElementById("iti-returned-fetch-output")!.textContent = JSON.stringify(fetchXml, null, 2);
 
-        log(`Launched entity picker with result: ${JSON.stringify(result)}`, "info");
+        log(`Launched FXS with result: ${JSON.stringify(result)}`, "info");
+    });
+    document.getElementById("iti-launch-iti-tool-btn")?.addEventListener("click", async () => {
+        const packageName = (document.getElementById("iti-tool-package-name") as HTMLInputElement).value;
+        const prefillData = (document.getElementById("iti-tool-prefill-data") as HTMLInputElement).value;
+        const result = await toolbox.invocation.launchTool(packageName, JSON.parse(prefillData));
+        document.getElementById("iti-returned-iti-tool-output")!.textContent = JSON.stringify(result, null, 2);
+
+        log(`Launched tool ${packageName} with result: ${JSON.stringify(result)}`, "info");
     });
 }
 
