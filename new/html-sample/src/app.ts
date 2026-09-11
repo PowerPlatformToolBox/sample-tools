@@ -26,6 +26,7 @@ let secondaryConnection: ToolBoxAPI.DataverseConnection | null = null;
 let currentTerminal: ToolBoxAPI.Terminal | null = null;
 let createdId: string | null = null;
 let currentLaunchContext: Record<string, unknown> | null = null;
+let preventCloseActive = false;
 
 let securitySuites: SecuritySuites | null = null;
 let terminalFeature: ReturnType<typeof createTerminalFeature> | null = null;
@@ -340,6 +341,10 @@ function setupEventHandlers() {
     document.getElementById("parallel-demo-btn")?.addEventListener("click", demoExecuteParallel);
     document.getElementById("loading-demo-btn")?.addEventListener("click", demoLoading);
 
+    // Prevent Close buttons
+    document.getElementById("enable-prevent-close-btn")?.addEventListener("click", enablePreventClose);
+    document.getElementById("disable-prevent-close-btn")?.addEventListener("click", disablePreventClose);
+
     // Settings buttons
     document.getElementById("load-setting-btn")?.addEventListener("click", loadToolSetting);
     document.getElementById("save-setting-btn")?.addEventListener("click", saveToolSetting);
@@ -411,6 +416,52 @@ async function showCurrentTheme() {
         log(`Current theme: ${theme}`, "info");
     } catch (error) {
         log(`Error getting theme: ${(error as Error).message}`, "error");
+    }
+}
+
+/**
+ * Update the Prevent Close status UI to reflect the current state
+ */
+function updatePreventCloseStatusUI() {
+    const status = document.getElementById("prevent-close-status");
+    const enableBtn = document.getElementById("enable-prevent-close-btn") as HTMLButtonElement;
+    const disableBtn = document.getElementById("disable-prevent-close-btn") as HTMLButtonElement;
+
+    if (status) {
+        status.className = preventCloseActive ? "info-box warning" : "info-box";
+        status.textContent = preventCloseActive ? "Prevent close is ENABLED. Closing this tab or quitting PPTB will show a warning dialog." : "Prevent close is currently disabled.";
+    }
+    if (enableBtn) enableBtn.disabled = preventCloseActive;
+    if (disableBtn) disableBtn.disabled = !preventCloseActive;
+}
+
+/**
+ * Enable prevent-close for this tool instance (e.g. to guard unsaved changes)
+ */
+async function enablePreventClose() {
+    try {
+        await toolbox.preventClose();
+        preventCloseActive = true;
+        updatePreventCloseStatusUI();
+        log("Prevent close enabled", "warning");
+        await showNotification("Prevent Close Enabled", "Closing this tool now requires confirmation", "warning");
+    } catch (error) {
+        log(`Error enabling prevent close: ${(error as Error).message}`, "error");
+    }
+}
+
+/**
+ * Release the prevent-close guard for this tool instance
+ */
+async function disablePreventClose() {
+    try {
+        await toolbox.releasePreventClose();
+        preventCloseActive = false;
+        updatePreventCloseStatusUI();
+        log("Prevent close disabled", "info");
+        await showNotification("Prevent Close Disabled", "This tool can now be closed without confirmation", "info");
+    } catch (error) {
+        log(`Error disabling prevent close: ${(error as Error).message}`, "error");
     }
 }
 

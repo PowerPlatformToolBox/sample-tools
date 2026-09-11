@@ -76,6 +76,19 @@
                 </div>
 
                 <div class="example-group">
+                    <h3>Prevent Close</h3>
+                    <p style="margin: 4px 0 8px; font-size: 12px; opacity: 0.8">
+                        Demonstrates <code>preventClose</code> / <code>releasePreventClose</code>. While enabled, closing this tool's tab or quitting PPTB shows a warning dialog with an
+                        "Ignore & Close" override.
+                    </p>
+                    <div class="button-group">
+                        <button id="enable-prevent-close-btn" class="btn btn-warning">Enable Prevent Close</button>
+                        <button id="disable-prevent-close-btn" class="btn" disabled>Disable Prevent Close</button>
+                    </div>
+                    <div id="prevent-close-status" class="info-box">Prevent close is currently disabled.</div>
+                </div>
+
+                <div class="example-group">
                     <h3>Terminal</h3>
                     <div class="button-group">
                         <button id="create-terminal-btn" class="btn">Create Terminal</button>

@@ -7,28 +7,29 @@ A complete example tool for Power Platform Tool Box built with HTML, CSS, and Ty
 This sample demonstrates:
 
 - ✅ **ToolBox API Integration**
-  - Connection management and status display
-  - Notifications (success, info, warning, error)
-  - Clipboard operations
-  - File save dialogs
-  - Tool settings storage (save/load/clear)
-  - Theme detection
-  - Terminal creation and command execution
-  - Event subscription and handling
+    - Connection management and status display
+    - Notifications (success, info, warning, error)
+    - Clipboard operations
+    - File save dialogs
+    - Tool settings storage (save/load/clear)
+    - Theme detection
+    - Terminal creation and command execution
+    - Event subscription and handling
+    - Prevent Close / Release Prevent Close (guard against accidental tool/app closure)
 
 - ✅ **Dataverse API Usage**
-  - FetchXML queries
-  - Multi-connection queries (primary and secondary)
-  - CRUD operations (Create, Read, Update, Delete)
-  - Entity metadata retrieval
-  - Error handling
+    - FetchXML queries
+    - Multi-connection queries (primary and secondary)
+    - CRUD operations (Create, Read, Update, Delete)
+    - Entity metadata retrieval
+    - Error handling
 
 - ✅ **Best Practices**
-  - TypeScript with full type safety
-  - Event-driven architecture
-  - Proper error handling
-  - Clean, modern UI design
-  - Responsive layout
+    - TypeScript with full type safety
+    - Event-driven architecture
+    - Proper error handling
+    - Clean, modern UI design
+    - Responsive layout
 
 ## Installation
 
@@ -79,6 +80,7 @@ html-sample/
 ### Features Overview
 
 #### Connection Status
+
 - Shows current Dataverse connection details
 - Displays environment type (Production, Sandbox, Dev)
 - Updates automatically when connection changes
@@ -86,15 +88,24 @@ html-sample/
 #### ToolBox API Examples
 
 **Notifications:**
+
 - Test different notification types
 - Success, info, warning, and error messages
 
 **Utilities:**
+
 - Copy data to clipboard
 - Get current theme (light/dark)
 - Save data to file with native dialog
 
+**Prevent Close:**
+
+- Call `preventClose()` to mark this tool instance as blocking closure (e.g. to guard unsaved changes)
+- While enabled, closing the tool's tab or quitting PPTB shows a warning dialog with an "Ignore & Close" override
+- Call `releasePreventClose()` to clear the guard once changes are saved
+
 **Terminal:**
+
 - Create isolated terminal instances
 - Execute shell commands
 - Run a safe terminal security probe (non-destructive)
@@ -105,22 +116,26 @@ html-sample/
 #### Dataverse API Examples
 
 **Query Records:**
+
 - FetchXML query to retrieve top 10 accounts
 - Display results with formatting
 - If a FetchXML is saved in Tool Settings, the Query button will use that instead of the default
- - This sample supports multi-connection: try the "Secondary" buttons to run the same queries against the secondary connection
+- This sample supports multi-connection: try the "Secondary" buttons to run the same queries against the secondary connection
 
 **CRUD Operations:**
+
 - Create new account records
 - Update existing records
 - Delete records
 - Full error handling
 
 **Metadata:**
+
 - Retrieve entity metadata
 - Display entity information and attributes
 
 #### Event Log
+
 - Real-time event logging
 - Color-coded by severity
 - Timestamp for each entry
@@ -160,29 +175,35 @@ const dataverse: typeof window.dataverseAPI = window.dataverseAPI;
 Use the built-in **Run Security Probe** button in the Terminal section to validate terminal exposure with safe commands only.
 
 What it checks:
+
 - Terminal can be created and receives command output
 - Basic command execution works
 - Command chaining is possible (risk signal if unrestricted)
 
 What it does not do:
+
 - No destructive commands
 - No credential, SSH, or private file access attempts
 - No process memory dumping attempts
 
 If the probe succeeds, treat that as a signal to enforce stricter host-side controls in Power Platform Tool Box:
+
 - Command allow-listing
 - Path allow-listing for filesystem APIs
 - Auditing/logging for terminal command execution
 
 This sample now includes policy guards in [src/security/policy.ts](src/security/policy.ts):
+
 - `getBlockedCommandReason(...)` / `getBlockedPathReason(...)`: policy decisions
 - `executeCommandWithPolicyGuard(...)` / `readTextWithPolicyGuard(...)`: central enforcement wrappers
 
 Security suites and report formatting live in:
+
 - [src/security/suites.ts](src/security/suites.ts)
 - [src/security/reporting.ts](src/security/reporting.ts)
 
 It also includes **API-specific Security Suite** buttons plus an **All Suites** runner. Each suite emits a JSON report with per-test `severity` and a rolled-up `highestSeverity`:
+
 - **Terminal suite:** command allow-list enforcement, multiline/control-character blocking, overlong command blocking, local-data-to-network exfil pattern blocking, burst handling
 - **FileSystem suite:** absolute-path enforcement, traversal blocking, sensitive path blocking, guarded read rejection checks, API surface checks
 - **Events suite:** event API presence and malformed payload resilience checks
@@ -200,14 +221,14 @@ Below demonstrates using `executeParallel` to run multiple Dataverse operations 
 ```typescript
 // Execute multiple operations in parallel
 const [account, contact, opportunities] = await toolboxAPI.utils.executeParallel(
-    dataverseAPI.retrieve('account', accountId, ['name']),
-    dataverseAPI.retrieve('contact', contactId, ['fullname']),
-    dataverseAPI.fetchXmlQuery(opportunityFetchXml)
+    dataverseAPI.retrieve("account", accountId, ["name"]),
+    dataverseAPI.retrieve("contact", contactId, ["fullname"]),
+    dataverseAPI.fetchXmlQuery(opportunityFetchXml),
 );
-console.log('All data fetched:', account, contact, opportunities);
+console.log("All data fetched:", account, contact, opportunities);
 
 // Show loading screen during operations
-await toolboxAPI.utils.showLoading('Processing data...');
+await toolboxAPI.utils.showLoading("Processing data...");
 try {
     // Perform operations
     await processData();
@@ -225,13 +246,13 @@ Use the tool settings API to persist user preferences and configuration for your
 
 ```typescript
 // Save a setting
-await toolboxAPI.settings.set('demo.fetchxml', myFetchXmlString);
+await toolboxAPI.settings.set("demo.fetchxml", myFetchXmlString);
 
 // Read a setting
-const saved = await toolboxAPI.settings.get('demo.fetchxml');
+const saved = await toolboxAPI.settings.get("demo.fetchxml");
 
 // Delete a setting
-await toolboxAPI.settings.delete('demo.fetchxml');
+await toolboxAPI.settings.delete("demo.fetchxml");
 ```
 
 In this sample, the “Tool Settings” section lets you save a FetchXML snippet. The “Query Top 10 Accounts” button will use the saved FetchXML if present, otherwise it falls back to the default.
@@ -241,10 +262,10 @@ In this sample, the “Tool Settings” section lets you save a FetchXML snippet
 ```typescript
 // Show notification
 await toolbox.utils.showNotification({
-    title: 'Success',
-    body: 'Operation completed',
-    type: 'success',
-    duration: 3000
+    title: "Success",
+    body: "Operation completed",
+    type: "success",
+    duration: 3000,
 });
 
 // Get active connection
@@ -252,12 +273,12 @@ const connection = await toolbox.connections.getActiveConnection();
 
 // Create terminal
 const terminal = await toolbox.terminal.create({
-    name: 'My Terminal'
+    name: "My Terminal",
 });
 
 // Subscribe to events
 toolbox.events.on((event, payload) => {
-    console.log('Event:', payload.event, payload.data);
+    console.log("Event:", payload.event, payload.data);
 });
 ```
 
@@ -274,34 +295,37 @@ const result = await dataverse.fetchXmlQuery(`
 `);
 
 // Query with FetchXML targeting the secondary connection
-const secondaryResult = await dataverse.fetchXmlQuery(`
+const secondaryResult = await dataverse.fetchXmlQuery(
+    `
     <fetch top="5">
         <entity name="account">
             <attribute name="name" />
             <order attribute="name" />
         </entity>
     </fetch>
-`, 'secondary');
+`,
+    "secondary",
+);
 
 // Create record
-const account = await dataverse.create('account', {
-    name: 'Contoso Ltd',
-    emailaddress1: 'info@contoso.com'
+const account = await dataverse.create("account", {
+    name: "Contoso Ltd",
+    emailaddress1: "info@contoso.com",
 });
 
 // Update record
-await dataverse.update('account', accountId, {
-    telephone1: '555-0100'
+await dataverse.update("account", accountId, {
+    telephone1: "555-0100",
 });
 
 // Delete record
-await dataverse.delete('account', accountId);
+await dataverse.delete("account", accountId);
 
 // Get metadata
-const metadata = await dataverse.getEntityMetadata('account');
+const metadata = await dataverse.getEntityMetadata("account");
 
 // Get metadata on secondary
-const metadataSecondary = await dataverse.getEntityMetadata('account', true, ['LogicalName'], 'secondary');
+const metadataSecondary = await dataverse.getEntityMetadata("account", true, ["LogicalName"], "secondary");
 ```
 
 ## Troubleshooting
@@ -309,6 +333,7 @@ const metadataSecondary = await dataverse.getEntityMetadata('account', true, ['L
 ### Build Errors
 
 If you encounter TypeScript errors:
+
 1. Ensure `@pptb/types` is installed: `npm install`
 2. Check TypeScript version: `tsc --version` (should be 5.x)
 3. Clean and rebuild: `rm -rf dist && npm run build`
@@ -316,6 +341,7 @@ If you encounter TypeScript errors:
 ### API Not Available
 
 If `toolboxAPI` or `dataverseAPI` is undefined:
+
 - The tool must be loaded within Power Platform Tool Box
 - These APIs are injected by the toolboxAPIBridge
 - They are not available in a standalone browser
@@ -323,6 +349,7 @@ If `toolboxAPI` or `dataverseAPI` is undefined:
 ### Connection Issues
 
 If connection is null:
+
 - Open Power Platform Tool Box
 - Create a connection to a Dataverse environment
 - The tool will automatically detect the connection

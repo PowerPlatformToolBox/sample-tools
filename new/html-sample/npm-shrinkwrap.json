@@ -1,15 +1,15 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.2.8",
+    "version": "1.5.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "pptb-standard-sample-tool",
-            "version": "1.2.8",
+            "version": "1.5.1",
             "license": "GPL-3.0",
             "devDependencies": {
-                "@pptb/types": "^1.2.4-beta.4",
+                "@pptb/types": "^1.2.6-beta.2",
                 "shx": "^0.4.0",
                 "typescript": "^5.0.0"
             },
@@ -69,22 +69,22 @@
             }
         },
         "node_modules/@pptb/types": {
-            "version": "1.2.4-beta.4",
-            "resolved": "https://registry.npmjs.org/@pptb/types/-/types-1.2.4-beta.4.tgz",
-            "integrity": "sha512-ipoQFehrZ6ndWAsIFZF1MBInM5hY0epUOsNf513oURnfie0Orcx2+7alt6B09LR2OG0egLf0BFxxg4iVDwMvNw==",
+            "version": "1.2.6-beta.2",
+            "resolved": "https://registry.npmjs.org/@pptb/types/-/types-1.2.6-beta.2.tgz",
+            "integrity": "sha512-k6Ov2Jfl3c2Et4h86fiKPZK2E0i/hIMGDNnXsXZgREAwU4tMtBmcqrQNr6YfFJOIRzM2fSbQDqW9bGecup5i2Q==",
             "dev": true,
             "license": "GPL-3.0",
             "dependencies": {
-                "@pptb/validate": "^0.0.2"
+                "@pptb/validate": "1.0.2"
             },
             "bin": {
                 "pptb-validate": "bin/pptb-validate.js"
             }
         },
         "node_modules/@pptb/validate": {
-            "version": "0.0.2",
-            "resolved": "https://registry.npmjs.org/@pptb/validate/-/validate-0.0.2.tgz",
-            "integrity": "sha512-QsuimcuDgEbblqC4uAeXE+ONm5KJ5twKbGFh9d8e4leF2jsISgVpVzYPgivSLUA9iomDGmMnXcklHPgb4jEf1A==",
+            "version": "1.0.2",
+            "resolved": "https://registry.npmjs.org/@pptb/validate/-/validate-1.0.2.tgz",
+            "integrity": "sha512-D6bfEa1a7p9ju7BUY2l/jJ8tK7s5SEtpvNriBRfasazP91mJ6eL5mLqOGwwjQ9aPyRJoeFyVmdF4gRyFMCcG7Q==",
             "dev": true,
             "license": "GPL-3.0",
             "dependencies": {
@@ -655,9 +655,9 @@
             }
         },
         "node_modules/tar": {
-            "version": "7.5.16",
-            "resolved": "https://registry.npmjs.org/tar/-/tar-7.5.16.tgz",
-            "integrity": "sha512-56adEpPMouktRlBLXiaYFFzZ/3+JXa8P9n7WbR+ibIjtviN55mEaOkiysCnPnWm+7kkui1Dn8J9l+g6zV8731w==",
+            "version": "7.5.22",
+            "resolved": "https://registry.npmjs.org/tar/-/tar-7.5.22.tgz",
+            "integrity": "sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==",
             "dev": true,
             "license": "BlueOak-1.0.0",
             "dependencies": {
