@@ -323,6 +323,9 @@ function setupEventHandlers() {
 
     //Execute buttons
     document.getElementById("whoami-btn")?.addEventListener("click", executeWhoAmI);
+    document.getElementById("query-with-headers-btn")?.addEventListener("click", queryAccountsWithHeaders);
+    document.getElementById("execute-batch-btn")?.addEventListener("click", executeReadBatch);
+    document.getElementById("execute-transaction-btn")?.addEventListener("click", executeAtomicTransaction);
 
     // Power Platform API buttons
     document.getElementById("list-apps-btn")?.addEventListener("click", listPowerApps);
@@ -924,6 +927,110 @@ async function executeWhoAmI() {
         const output = document.getElementById("execute-output");
         if (output) output.textContent = `Error: ${(error as Error).message}`;
         log(`Error executing WhoAmI: ${(error as Error).message}`, "error");
+    }
+}
+
+function getAdditionalHeaders(): DataverseAPI.AdditionalHeaders {
+    const input = document.getElementById("dataverse-headers") as HTMLTextAreaElement | null;
+    const parsed: unknown = JSON.parse(input?.value || "{}");
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        throw new Error("Additional headers must be a JSON object");
+    }
+
+    const headers: DataverseAPI.AdditionalHeaders = {};
+    for (const [name, value] of Object.entries(parsed)) {
+        if (typeof value !== "string") {
+            throw new Error(`Header value for '${name}' must be a string`);
+        }
+        headers[name] = value;
+    }
+
+    return headers;
+}
+
+async function queryAccountsWithHeaders() {
+    if (!currentConnection) {
+        await showNotification("No Connection", "Please connect to a Dataverse environment", "warning");
+        return;
+    }
+
+    const output = document.getElementById("headers-output");
+    try {
+        const headers = getAdditionalHeaders();
+        if (output) output.textContent = "Querying accounts with additional headers...\n";
+
+        const result = await dataverse.queryData("accounts?$select=name,accountid&$top=5", "primary", headers);
+        if (output) {
+            output.textContent = `Found ${result.value.length} account(s):\n\n`;
+            output.textContent += JSON.stringify(result.value, null, 2);
+        }
+        log(`Queried ${result.value.length} accounts with additional headers`, "success");
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error querying accounts with headers: ${(error as Error).message}`, "error");
+    }
+}
+
+async function executeReadBatch() {
+    if (!currentConnection) {
+        await showNotification("No Connection", "Please connect to a Dataverse environment", "warning");
+        return;
+    }
+
+    const output = document.getElementById("batch-output");
+    try {
+        const headers = getAdditionalHeaders();
+        if (output) output.textContent = "Executing read batch...\n";
+
+        const results = await dataverse.executeBatch(
+            [
+                { method: "GET", url: "accounts?$select=name,accountid&$top=3" },
+                { method: "GET", url: "contacts?$select=fullname,contactid&$top=3" },
+            ],
+            "primary",
+            headers,
+        );
+
+        if (output) output.textContent = `Batch returned ${results.length} result(s):\n\n${JSON.stringify(results, null, 2)}`;
+        log(`Read batch completed with ${results.length} result(s)`, "success");
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error executing read batch: ${(error as Error).message}`, "error");
+    }
+}
+
+async function executeAtomicTransaction() {
+    if (!currentConnection) {
+        await showNotification("No Connection", "Please connect to a Dataverse environment", "warning");
+        return;
+    }
+
+    const output = document.getElementById("batch-output");
+    try {
+        const headers = getAdditionalHeaders();
+        const suffix = new Date().toISOString();
+        if (output) output.textContent = `Executing atomic transaction (creating an account and contact - ${`HTML Sample ${suffix}`} )...\n`;
+
+        const results = await dataverse.executeTransaction(
+            [
+                { method: "POST", url: "accounts", contentId: "account", body: { name: `HTML Sample ${suffix}` } },
+                {
+                    method: "POST",
+                    url: "contacts",
+                    contentId: "contact",
+                    body: { firstname: "HTML", lastname: `Sample ${suffix}` },
+                },
+            ],
+            "primary",
+            headers,
+        );
+
+        if (output) output.textContent = `Transaction returned ${results.length} result(s):\n\n${JSON.stringify(results, null, 2)}`;
+        log(`Atomic transaction completed with ${results.length} result(s)`, "success");
+    } catch (error) {
+        if (output) output.textContent = `Error: ${(error as Error).message}`;
+        log(`Error executing atomic transaction: ${(error as Error).message}`, "error");
     }
 }
 

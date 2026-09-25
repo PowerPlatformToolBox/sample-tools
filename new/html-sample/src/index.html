@@ -183,6 +183,38 @@
                     <button id="whoami-btn" class="btn">Execute WhoAmI</button>
                     <div id="execute-output" class="output"></div>
                 </div>
+
+                <div class="example-group">
+                    <h3>Additional Headers</h3>
+                    <p style="margin: 4px 0 10px; font-size: 12px; opacity: 0.85">
+                        Headers are shown for consent before the request is sent. Use valid Dataverse header names and string values.
+                    </p>
+                    <div class="input-group">
+                        <label for="dataverse-headers">Additional Headers (JSON):</label>
+                        <textarea
+                            id="dataverse-headers"
+                            style="width: 100%; min-height: 90px; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4"
+                        >{
+  "Prefer": "odata.include-annotations=\"*\""
+}</textarea>
+                    </div>
+                    <div class="button-group">
+                        <button id="query-with-headers-btn" class="btn btn-primary">Query Accounts with Headers</button>
+                    </div>
+                    <div id="headers-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
+                    <h3>Batch Operations</h3>
+                    <p style="margin: 4px 0 10px; font-size: 12px; opacity: 0.85">
+                        Runs independent reads in one <code>$batch</code> request or creates an account and contact in one atomic transaction.
+                    </p>
+                    <div class="button-group">
+                        <button id="execute-batch-btn" class="btn btn-primary">Execute Read Batch</button>
+                        <button id="execute-transaction-btn" class="btn btn-warning">Execute Atomic Transaction</button>
+                    </div>
+                    <div id="batch-output" class="output"></div>
+                </div>
             </section>
 
             <!-- Power Platform API Examples -->

@@ -1,6 +1,6 @@
 {
     "name": "pptb-standard-sample-tool",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "displayName": "HTML Sample Tool",
     "description": "A sample Power Platform ToolBox tool built with HTML, CSS, and TypeScript",
     "main": "index.html",
@@ -79,7 +79,7 @@
         "validate": "pptb-validate"
     },
     "devDependencies": {
-        "@pptb/types": "^1.2.6-beta.2",
+        "@pptb/types": "^1.2.7-beta.0",
         "shx": "^0.4.0",
         "typescript": "^5.0.0"
     },
