@@ -21,8 +21,9 @@ const dataverse = window.dataverseAPI;
 const powerplatform = window.powerplatformAPI;
 
 // Application state
-let currentConnection: ToolBoxAPI.DataverseConnection | null = null;
-let secondaryConnection: ToolBoxAPI.DataverseConnection | null = null;
+let currentConnection: ToolBoxAPI.Connection | null = null;
+let secondaryConnection: ToolBoxAPI.Connection | null = null;
+let thirdConnection: ToolBoxAPI.Connection | null = null;
 let currentTerminal: ToolBoxAPI.Terminal | null = null;
 let createdId: string | null = null;
 let currentLaunchContext: Record<string, unknown> | null = null;
@@ -160,7 +161,8 @@ async function identifyLaunchContext() {
 async function refreshConnection() {
     try {
         currentConnection = await toolbox.connections.getActiveConnection();
-        secondaryConnection = await toolbox.connections.getSecondaryConnection();
+        secondaryConnection = await toolbox.connections.getConnection("secondary");
+        thirdConnection = await toolbox.connections.getConnection(2);
 
         const connectionInfo = document.getElementById("connection-info");
         if (!connectionInfo) return;
@@ -229,6 +231,39 @@ async function refreshConnection() {
             secondaryInfo.className = "info-box warning";
             secondaryInfo.innerHTML = "<p><strong>⚠️ No secondary connection</strong><br>Please connect to a secondary Dataverse environment to use this tool.</p>";
             log("No secondary connection found", "warning");
+        }
+
+        const thirdInfo = document.getElementById("third-connection-info");
+        if (!thirdInfo) return;
+
+        if (thirdConnection) {
+            const envClass = thirdConnection.environment.toLowerCase();
+            thirdInfo.className = "info-box success";
+            thirdInfo.innerHTML = `
+                <div class="connection-details">
+                    <div class="connection-item">
+                        <strong>Name:</strong>
+                        <span>${thirdConnection.name}</span>
+                    </div>
+                    <div class="connection-item">
+                        <strong>URL:</strong>
+                        <span>${thirdConnection.url}</span>
+                    </div>
+                    <div class="connection-item">
+                        <strong>Environment:</strong>
+                        <span class="env-badge ${envClass}">${thirdConnection.environment}</span>
+                    </div>
+                    <div class="connection-item">
+                        <strong>ID:</strong>
+                        <span>${thirdConnection.id}</span>
+                    </div>
+                </div>
+            `;
+            log(`Third connection: ${thirdConnection.name}`, "success");
+        } else {
+            thirdInfo.className = "info-box warning";
+            thirdInfo.innerHTML = "<p><strong>⚠️ No third connection</strong><br>Please connect a third Dataverse environment to use this tool.</p>";
+            log("No third connection found", "warning");
         }
     } catch (error) {
         log(`Error refreshing connection: ${(error as Error).message}`, "error");
@@ -309,6 +344,7 @@ function setupEventHandlers() {
     // Dataverse query button
     document.getElementById("query-accounts-btn")?.addEventListener("click", queryAccounts);
     document.getElementById("query-accounts-secondary-btn")?.addEventListener("click", queryAccountsSecondary);
+    document.getElementById("query-accounts-third-btn")?.addEventListener("click", queryAccountsThird);
     document.getElementById("query-contacts-querydata-btn")?.addEventListener("click", queryContactQueryData);
 
     // CRUD buttons
@@ -707,6 +743,55 @@ async function queryAccountsSecondary() {
         const output = document.getElementById("query-output-secondary");
         if (output) output.textContent = `Error (secondary): ${(error as Error).message}`;
         log(`Error querying accounts (secondary): ${(error as Error).message}`, "error");
+    }
+}
+
+/**
+ * Query accounts from Dataverse using the third connection slot (FetchXML)
+ */
+async function queryAccountsThird() {
+    if (!thirdConnection) {
+        await showNotification("No Third Connection", "Please configure a third Dataverse connection", "warning");
+        return;
+    }
+
+    const output = document.getElementById("query-output-third");
+    try {
+        if (output) output.textContent = "Querying accounts using third connection...\n";
+
+        const saved = await getSetting<string>("demo.fetchxml");
+        const fetchXml =
+            saved && saved.trim().length > 0
+                ? saved
+                : `
+<fetch top="10">
+    <entity name="account">
+        <attribute name="name" />
+        <attribute name="accountid" />
+        <attribute name="emailaddress1" />
+        <attribute name="telephone1" />
+        <order attribute="name" />
+    </entity>
+</fetch>
+        `.trim();
+
+        const result = await dataverse.fetchXmlQuery(fetchXml, 2);
+
+        if (output) {
+            output.textContent = `Found ${result.value.length} account(s) on third connection:\n\n`;
+            result.value.forEach((account: any, index: number) => {
+                output.textContent += `${index + 1}. ${account.name}\n`;
+                output.textContent += `   ID: ${account.accountid}\n`;
+                if (account.emailaddress1) output.textContent += `   Email: ${account.emailaddress1}\n`;
+                if (account.telephone1) output.textContent += `   Phone: ${account.telephone1}\n`;
+                output.textContent += "\n";
+            });
+        }
+
+        log(`Queried ${result.value.length} accounts on third connection`, "success");
+    } catch (error) {
+        if (output) output.textContent = `Error (third connection): ${(error as Error).message}`;
+        log(`Error querying accounts (third connection): ${(error as Error).message}`, "error");
     }
 }
 

@@ -120,7 +120,7 @@ html-sample/
 - FetchXML query to retrieve top 10 accounts
 - Display results with formatting
 - If a FetchXML is saved in Tool Settings, the Query button will use that instead of the default
-- This sample supports multi-connection: try the "Secondary" buttons to run the same queries against the secondary connection
+- This sample supports up to three connections: use the Primary, Secondary, and Third query buttons to test slots 0, 1, and 2
 
 **CRUD Operations:**
 
