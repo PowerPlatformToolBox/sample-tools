@@ -162,6 +162,19 @@
                 </div>
 
                 <div class="example-group">
+                    <h3>.NET Worker Test (Account Summary)</h3>
+                    <p class="info-box warning">Native code runs as your OS user and is not sandboxed. The worker groups account rows by country.</p>
+                    <div class="button-group">
+                        <button id="worker-start-btn" class="btn">Start worker</button>
+                        <button id="worker-query-btn" class="btn btn-primary" disabled>Summarize Accounts by Country (Top 10)</button>
+                        <button id="worker-cancel-btn" class="btn btn-warning" disabled>Cancel summary</button>
+                        <button id="worker-stop-btn" class="btn btn-error" disabled>Stop worker</button>
+                    </div>
+                    <div id="worker-status" role="status" aria-live="polite">Worker stopped</div>
+                    <div id="worker-output" class="output"></div>
+                </div>
+
+                <div class="example-group">
                     <h3>CRUD Operations</h3>
                     <div class="input-group">
                         <label for="contact-firstname">Contact First Name:</label>

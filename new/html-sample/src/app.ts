@@ -1,5 +1,6 @@
 /// <reference types="@pptb/types" />
 
+import { createDotnetWorkerFeature } from "./features/dotnetWorker.js";
 import { createFileSystemFeature } from "./features/filesystem.js";
 import { createTerminalFeature } from "./features/terminal.js";
 import { createSecuritySuites, type SecuritySuites } from "./security/suites.js";
@@ -32,6 +33,7 @@ let preventCloseActive = false;
 let securitySuites: SecuritySuites | null = null;
 let terminalFeature: ReturnType<typeof createTerminalFeature> | null = null;
 let fileSystemFeature: ReturnType<typeof createFileSystemFeature> | null = null;
+let dotnetWorkerFeature: ReturnType<typeof createDotnetWorkerFeature> | null = null;
 let inputEntityName: string | null = null;
 let fetchXmlFromLaunchContext: string | null = null;
 
@@ -83,6 +85,12 @@ async function initialize() {
             showNotification,
             log,
             getCurrentConnection: () => currentConnection,
+        });
+        dotnetWorkerFeature = createDotnetWorkerFeature({
+            toolbox,
+            dataverse,
+            getCurrentConnection: () => currentConnection,
+            log,
         });
 
         // Initialize security suites (used by UI buttons)
@@ -346,6 +354,10 @@ function setupEventHandlers() {
     document.getElementById("query-accounts-secondary-btn")?.addEventListener("click", queryAccountsSecondary);
     document.getElementById("query-accounts-third-btn")?.addEventListener("click", queryAccountsThird);
     document.getElementById("query-contacts-querydata-btn")?.addEventListener("click", queryContactQueryData);
+    document.getElementById("worker-start-btn")?.addEventListener("click", () => dotnetWorkerFeature?.start());
+    document.getElementById("worker-query-btn")?.addEventListener("click", () => dotnetWorkerFeature?.query());
+    document.getElementById("worker-cancel-btn")?.addEventListener("click", () => dotnetWorkerFeature?.cancel());
+    document.getElementById("worker-stop-btn")?.addEventListener("click", () => dotnetWorkerFeature?.stop());
 
     // CRUD buttons
     document.getElementById("create-contact-btn")?.addEventListener("click", createContact);
@@ -613,9 +625,21 @@ function handleCommandCompleted(data: any) {
     requireTerminalFeature().handleCommandCompleted(data);
 }
 
-/**
- * Query accounts from Dataverse
- */
+async function getAccountFetchXml(): Promise<string> {
+    const saved = await getSetting<string>("demo.fetchxml");
+    return saved && saved.trim().length > 0
+        ? saved
+        : `<fetch top="10">
+    <entity name="account">
+        <attribute name="name" />
+        <attribute name="accountid" />
+        <attribute name="emailaddress1" />
+        <attribute name="telephone1" />
+        <order attribute="name" />
+    </entity>
+</fetch>`;
+}
+
 async function queryAccounts() {
     if (!currentConnection) {
         await showNotification("No Connection", "Please connect to a Dataverse environment", "warning");
@@ -625,24 +649,7 @@ async function queryAccounts() {
     try {
         const output = document.getElementById("query-output");
         if (output) output.textContent = "Querying accounts...\n";
-
-        // If user saved a FetchXML in settings, prefer that; otherwise use default
-        const saved = await getSetting<string>("demo.fetchxml");
-        const fetchXml =
-            saved && saved.trim().length > 0
-                ? saved
-                : `
-<fetch top="10">
-    <entity name="account">
-        <attribute name="name" />
-        <attribute name="accountid" />
-        <attribute name="emailaddress1" />
-        <attribute name="telephone1" />
-        <order attribute="name" />
-    </entity>
-</fetch>
-                `.trim();
-
+        const fetchXml = await getAccountFetchXml();
         const result = await dataverse.fetchXmlQuery(fetchXml);
 
         if (output) {

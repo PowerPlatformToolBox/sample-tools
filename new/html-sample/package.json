@@ -73,7 +73,10 @@
         "node": ">=18.0.0"
     },
     "scripts": {
-        "build": "tsc && npm run copy-html && npm run copy-css && npm run copy-icon",
+        "build": "tsc && npm run build-worker && npm run copy-html && npm run copy-css && npm run copy-icon",
+        "build-worker": "esbuild src/features/dotnetWorker.ts --bundle --format=esm --platform=browser --outfile=dist/features/dotnetWorker.js",
+        "pack:worker": "dotnet pack dotnet/Worker/Worker.csproj --configuration Release --output dotnet/feed -p:RestoreLockedMode=true",
+        "test": "npm run build && node --test tests/dotnetWorker.test.mjs",
         "copy-html": "shx cp src/index.html dist/",
         "copy-css": "shx cp src/styles.css dist/",
         "copy-icon": "shx cp -r icon/ dist/icon/",
@@ -81,7 +84,8 @@
         "validate": "pptb-validate"
     },
     "devDependencies": {
-        "@pptb/types": "^1.2.7-beta.4",
+        "@pptb/types": "1.2.7-beta.6",
+        "esbuild": "0.25.12",
         "shx": "^0.4.0",
         "typescript": "^5.0.0"
     },
@@ -89,5 +93,8 @@
         "dist",
         "npm-shrinkwrap.json",
         "pptb.config.json"
-    ]
+    ],
+    "allowScripts": {
+        "esbuild@0.25.12": true
+    }
 }

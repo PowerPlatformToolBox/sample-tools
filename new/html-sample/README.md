@@ -56,6 +56,7 @@ This compiles the TypeScript source in `src/` to JavaScript in `dist/`.
 
 ```
 html-sample/
+├── dotnet/              # C# worker tool and shared Core project
 ├── src/
 │   ├── app.ts           # Main application logic (TypeScript)
 │   ├── features/        # UI feature modules (terminal, filesystem, etc.)
@@ -169,6 +170,142 @@ const dataverse: typeof window.dataverseAPI = window.dataverseAPI;
 2. **Add Features:** Update `src/app.ts`
 3. **Rebuild:** Run `npm run build`
 4. **Reload Tool:** In Power Platform Tool Box, close and reopen the tool
+
+## .NET Worker Test
+
+The **.NET Worker Test (Account Summary)** section is beside Query Records. The
+worker summarizes up to ten accounts by country. The TypeScript callback builds
+the FetchXML and calls Dataverse; the C# worker groups the returned rows and
+returns `{ totalAccounts, countries: [{ country, count }] }`. The direct account
+query remains independent and continues to use saved `demo.fetchxml`. Start,
+summarize, cancel and stop are explicit; worker status/output is separate.
+Loading the tool does not start .NET. The headless entry point is unchanged and
+never starts a worker.
+
+The complete C# sample is in `dotnet/Worker`; it has no separate Core project.
+Workers run as the current OS user and **are not sandboxed**. No tokens, secrets
+or credential environment variables are sent by this tool.
+
+Tool code uses PPTB's worker session API rather than implementing a JSON-RPC
+transport:
+
+```typescript
+const worker = await toolboxAPI.workers.connect("sample", {
+    requests: {
+        "dataverse/getAccounts": (params, context) => {
+            const top = typeof params === "object" && params !== null && "top" in params ? params.top : undefined;
+            if (typeof top !== "number" || !Number.isSafeInteger(top) || top < 1 || top > 100) throw new Error("Expected an account limit from 1 to 100");
+            if (context.isCancellationRequested) throw new Error("Cancelled");
+            const fetchXml = `<fetch top="${top}"><entity name="account"><attribute name="name" /><attribute name="address1_country" /></entity></fetch>`;
+            return dataverseAPI.fetchXmlQuery(fetchXml).then((result) => ({ value: result.value }));
+        },
+    },
+    notifications: {
+        progress: (message) => showStatus(String(message)),
+    },
+});
+
+await worker.ready;
+const result = await worker.request("accounts/summarizeByCountry", { top: 10 });
+await worker.stop();
+```
+
+PPTB owns JSON-RPC framing, readiness buffering, request correlation,
+cancellation, and transport disposal. Tool authors provide only the
+worker-initiated callbacks they need and call named worker methods.
+
+### Build And Pack
+
+Use the PR7 desktop development build, Node.js, and a compatible installed .NET
+10 SDK/runtime. This sample pins `@pptb/types@1.2.7-beta.6`, the current npm
+beta tag, for `workers.connect()`. The shrinkwrap locks that exact release;
+dependency changes use npm and the existing shrinkwrap workflow (`npm run finalize-package`).
+The beta still depends on `@pptb/validate@1.0.4`, which warns that `workers` is
+unrecognized. That validator result is not worker-declaration validation; the
+current desktop worker validator remains authoritative.
+
+From this `html-sample` directory:
+
+```sh
+npm install
+npm test
+npm run pack:worker
+```
+
+The pack command writes `PPTB.Sample.Query.Worker.0.1.4.nupkg` to `dotnet/feed/`.
+The exact declaration is `PPTB.Sample.Query.Worker@0.1.4`, command
+`pptb-sample-query-worker`, targeting `net10.0`. Inspect the `.nupkg`: it must
+contain `Worker.dll`, managed dependencies, runtime/dependency manifests and
+`DotnetToolSettings.xml`. Changing package bytes requires a fresh
+worker version and a matching `packageVersion` update in `pptb.config.json`. Do
+not overwrite a version with new bytes. `platforms: ["all"]` is the PPTB support
+matrix, not qualification evidence.
+
+### Load Local Tool
+
+From the desktop-app repo in PowerShell, point to this repo's generated feed in
+the main-process environment:
+
+```powershell
+$env:PPTB_DOTNET_LOCAL_NUGET_FEED = (Resolve-Path "../sample-tools/new/html-sample/dotnet/feed").Path
+pnpm run dev
+```
+
+On macOS/Linux shells:
+
+```sh
+PPTB_DOTNET_LOCAL_NUGET_FEED="$(cd ../sample-tools/new/html-sample/dotnet/feed && pwd -P)" pnpm run dev
+```
+
+First run `npm run pack:worker` in `html-sample`. The feed must already exist
+and be a flat directory containing only regular files, with no symlink path
+components, subdirectories, symlink files or hard-linked files. On other OSes,
+choose an absolute canonical directory satisfying the same rules. Set the
+environment variable before launching PPTB; restart the development app after
+changing it. The previously packed package is accessible at the canonical path
+without moving or repacking it.
+
+The feed requires both the Vite development bundle's main-only
+`PPTB_DEVELOPER_BUILD=1` marker and an unpackaged app. Production-mode unpackaged
+and packaged builds reject it. Never add the feed to the tool manifest or
+renderer. Registry, marketplace and npm-debug installs remain nuget.org-only;
+only the exact local worker package ID is mapped to this feed, and dependencies
+remain on nuget.org. Source path/package digest changes require fresh consent.
+
+1. Use **Load Local Tool** to load `sample-tools/new/html-sample` and select an
+   authenticated primary Dataverse connection.
+2. Start worker, review native-code consent, and wait for Worker ready.
+3. Select **Summarize Accounts by Country (Top 10)**. TypeScript sends
+   `accounts/summarizeByCountry({ top: 10 })`; C# calls the registered
+   `dataverse/getAccounts({ top: 10 })` callback. TypeScript builds the bounded
+   FetchXML and returns only account names and country values; C# groups those
+   rows and returns `{ totalAccounts, countries: [{ country, count }] }`.
+4. Cancel a pending query, then stop explicitly. Cancellation is cooperative;
+   the existing Dataverse API does not abort an in-flight HTTP request. No request
+   is automatically replayed. A failed stop disables start/query until cleanup
+   is verified; Stop worker remains available to retry.
+5. Also check consent denial/revocation, tool close and app quit.
+
+### Verification Boundaries
+
+`npm test` builds the browser bundle and runs simulated worker transport tests;
+it does not launch C#. There were no pre-existing automated sample test scripts;
+the interactive security suites remain available in the UI.
+
+For an opt-in **real packaged C# stdio** test, extract the `.nupkg` into a temporary
+directory, then run from `new/html-sample` with absolute paths:
+
+```sh
+node tests/dotnetWorker.smoke.mjs /usr/local/share/dotnet/dotnet \
+  /absolute/path/to/extracted/tools/net10.0/any/Worker.dll
+```
+
+This launches native code explicitly with a minimal credential-free environment.
+It checks initialize, account summary, reverse callbacks with fixture data, progress,
+cancellation and EOF exit. It does **not** test live Dataverse, local-feed restore,
+PPTB consent/broker, or other OS/architecture targets. The full Load Local Tool
+smoke remains a separate manual gate; do not infer PR7 completion from either
+simulated transport tests or this real-stdio fixture.
 
 ## Security Testing Guidance
 
