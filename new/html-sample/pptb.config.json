@@ -3,7 +3,7 @@
         "sample": {
             "kind": "dotnet-tool",
             "packageId": "PPTB.Sample.Query.Worker",
-            "packageVersion": "0.1.5",
+            "packageVersion": "0.1.6",
             "command": "pptb-sample-query-worker",
             "dotnet": {
                 "targetFramework": "net10.0",

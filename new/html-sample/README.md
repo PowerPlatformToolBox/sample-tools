@@ -232,8 +232,8 @@ npm test
 npm run pack:worker
 ```
 
-The pack command writes `PPTB.Sample.Query.Worker.0.1.4.nupkg` to `dotnet/feed/`.
-The exact declaration is `PPTB.Sample.Query.Worker@0.1.4`, command
+The pack command writes `PPTB.Sample.Query.Worker.0.1.6.nupkg` to `dotnet/feed/`.
+The exact declaration is `PPTB.Sample.Query.Worker@0.1.6`, command
 `pptb-sample-query-worker`, targeting `net10.0`. Inspect the `.nupkg`: it must
 contain `Worker.dll`, managed dependencies, runtime/dependency manifests and
 `DotnetToolSettings.xml`. Changing package bytes requires a fresh

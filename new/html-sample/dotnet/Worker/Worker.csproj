@@ -7,10 +7,16 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>pptb-sample-query-worker</ToolCommandName>
         <PackageId>PPTB.Sample.Query.Worker</PackageId>
-        <Version>0.1.5</Version>
+        <Version>0.1.6</Version>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="StreamJsonRpc" Version="2.25.29" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="../../LICENSE" Pack="true" PackagePath="\" />
+        <None Include="../../README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>
